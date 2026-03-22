@@ -1,0 +1,71 @@
+.testimonials-section {
+  background: #ffffff;
+  padding: 0 !important; /* Override global .section padding so card bisects the border exactly */
+  position: relative;
+}
+.testimonials-wrap {
+  max-width: 880px;
+  margin: 0 auto;
+  transform: translateY(-50%);
+  margin-bottom: -40px; /* Leave enough layout height so Portfolio doesn't slide underneath completely */
+  position: relative;
+  z-index: 10;
+}
+.testimonials-inner {
+  background: var(--white);
+  border: 1px solid var(--text-dark);
+  border-radius: var(--radius-card);
+  box-shadow: none;
+  padding: 64px 80px;
+  position: relative;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+.stars-row { display: flex; gap: 4px; justify-content: center; }
+.star { font-size: 20px; color: var(--text-dark); }
+.testimonial-quote {
+  font-family: var(--font-head);
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 500;
+  line-height: 1.6;
+  color: #333;
+  border: none;
+}
+.testimonial-author {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  font-size: 14px;
+}
+.author-name { font-family: var(--font-head); font-weight: 800; color: var(--text-dark); }
+.author-sep { opacity: 0.3; }
+.author-role { color: #555; }
+
+/* Floating Nav */
+.nav-btn {
+  position: absolute;
+  top: 50%;
+  width: 46px; height: 46px;
+  border-radius: 50%;
+  border: 1px solid var(--text-dark);
+  background: #e3f2fd; /* Light blue from reference */
+  font-size: 20px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: opacity 0.2s, transform 0.2s;
+  box-shadow: none;
+  z-index: 20;
+}
+.nav-prev {
+  left: 0;
+  transform: translate(-50%, -50%);
+}
+.nav-next {
+  right: 0;
+  transform: translate(50%, -50%);
+}
+.nav-btn:hover { opacity: 0.8; }
+

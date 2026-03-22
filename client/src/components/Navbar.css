@@ -1,0 +1,146 @@
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background: var(--white);
+  /* Distinct white background matching reference */
+  border-bottom: 2px solid var(--text-dark);
+  padding: 27px 0;
+  transition: padding 0.35s ease, box-shadow 0.35s ease;
+}
+
+/* ── NAVBAR ── */
+.header-wrapper {
+  /* Using fixed navbar, so wrapper just acts as structural grouping */
+  width: 100%;
+}
+
+.navbar.scrolled {
+  padding: 21px 0;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+}
+
+.nav-inner {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.nav-logo {
+  font-family: var(--font-head);
+  font-size: 30px;
+  font-weight: 800;
+  color: var(--text-dark);
+  letter-spacing: -0.025em;
+  flex-shrink: 0;
+  margin-right: auto;
+}
+
+.nav-links {
+  display: flex;
+  gap: 36px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.nav-links li a {
+  font-family: var(--font-head);
+  font-size: 19px;
+  font-weight: 600;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.nav-links li a:hover {
+  color: var(--purple-accent);
+}
+
+.nav-links li a.active-link {
+  color: var(--purple-accent);
+}
+
+.nav-socials {
+  display: flex;
+  gap: 8px;
+  margin-left: auto;
+}
+
+.nav-socials a {
+  width: 38px;
+  height: 38px;
+  border: var(--border);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  color: var(--text-dark);
+  background: var(--white);
+  box-shadow: 3px 3px 0px #1d1d1d;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.nav-socials a:hover {
+  transform: translate(-1px, -1px);
+  box-shadow: 4px 4px 0px #1d1d1d;
+}
+
+.hamburger {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 22px;
+  cursor: pointer;
+  color: var(--text-dark);
+  margin-left: 16px;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    padding: 20px 0;
+  }
+
+  .navbar.scrolled {
+    padding: 12px 0;
+  }
+
+  .hamburger {
+    display: block;
+  }
+
+  .nav-socials {
+    display: none;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 66px;
+    left: -100%;
+    width: 100%;
+    background: #fff;
+    flex-direction: column;
+    gap: 0;
+    padding: 8px 0;
+    border-bottom: 1.5px solid #eee;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: none;
+    transition: left 0.3s ease;
+  }
+
+  .nav-links.open {
+    left: 0;
+  }
+
+  .nav-links li a {
+    padding: 12px 24px;
+    display: block;
+  }
+
+  .hamburger {
+    display: flex;
+  }
+}
