@@ -8,7 +8,9 @@ import { fileURLToPath } from 'url'
 import authRoutes from './routes/auth.js'
 import sectionRoutes from './routes/sections.js'
 import uploadRoutes from './routes/upload.js'
+import paymentRoutes from './routes/payment.js'
 import Section from './models/Section.js'
+import nodemailer from 'nodemailer'
 
 dotenv.config()
 
@@ -24,8 +26,9 @@ app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 app.use('/api/auth', authRoutes)
 app.use('/api/sections', sectionRoutes)
 app.use('/api/upload', uploadRoutes)
+app.use('/api/payment', paymentRoutes)
 
-// ── Contact messages (kept from original) ──
+// ── Contact messages ──
 const messageSchema = new mongoose.Schema({
   name:      { type: String, required: true },
   email:     { type: String, required: true },
@@ -40,6 +43,31 @@ app.post('/api/contact', async (req, res) => {
   try {
     const doc = await Message.create({ name, email, message })
     console.log('📨 New message from:', name, email)
+
+    if (process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+      try {
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS,
+          },
+        })
+        await transporter.sendMail({
+          from: `"Portfolio Contact Form" <${process.env.EMAIL_USER}>`,
+          replyTo: email,
+          to: 'rishukrsingh99p@gmail.com',
+          subject: `New Message from ${name} via Portfolio`,
+          text: `You just received a new message from your portfolio contact form!\n\nName: ${name}\nEmail: ${email}\n\nMessage:\n${message}`,
+        })
+        console.log('✅ Notification email forwarded to rishukrsingh99p@gmail.com')
+      } catch (mailErr) {
+        console.error('❌ Failed to send email notification:', mailErr.message)
+      }
+    } else {
+      console.log('⚠️ EMAIL_USER or EMAIL_PASS not set in .env. Skipping email dispatch.')
+    }
+
     res.status(201).json({ success: true, id: doc._id })
   } catch (err) {
     console.error(err)

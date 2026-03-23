@@ -33,7 +33,7 @@ export default function Blog() {
                 key={title + i}
                 href={url}
                 className="blog-card"
-                style={{ background: bg }}
+                style={{ borderTop: `6px solid ${bg}` }}
                 initial={{ opacity: 0, y: 28 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: i * 0.1, duration: 0.5 }}

@@ -1,79 +1,142 @@
 .services-section {
-  background: var(--white);
+  background: #f7f3ee; /* light warm beige like the reference */
   position: relative;
   overflow: hidden;
+  padding: 100px 0;
 }
 /* decorations */
-.lightning-deco {
-  position: absolute;
-  left: 7%;
-  top: 40%;
-  font-size: 48px;
-  opacity: 0.22;
-  transform: rotate(-5deg);
-  pointer-events: none;
-}
-.sparkle-deco {
-  position: absolute;
-  color: var(--text-dark);
-  opacity: 0.4;
-  pointer-events: none;
-}
-.s1 { right: 8%; top: 32%; font-size: 24px; }
-.s2 { right: 5%; top: 42%; font-size: 14px; }
+.lightning-deco, .sparkle-deco { display: none; } /* removed to match clean aesthetic */
 
 /* Center tag */
 .services-tag {
-  display: block;
-  width: fit-content;
-  margin: 0 auto 20px;
-}
-/* 2×2 grid */
-.services-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
-  max-width: 860px;
-  margin: 0 auto;
-}
-/* Horizontal card: icon LEFT, text RIGHT */
-.service-card {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-  border-radius: var(--radius-card);
-  padding: 28px 24px;
-  border: var(--border);
-  box-shadow: var(--card-shadow);
-  transition: transform 0.18s;
-  cursor: default;
-}
-.service-card:hover { transform: translate(-2px, -2px); }
-.service-icon-wrap {
-  flex-shrink: 0;
-  width: 56px; height: 56px;
-  border-radius: 14px;
-  border: var(--border);
   display: flex;
   align-items: center;
   justify-content: center;
-  background: rgba(255,255,255,0.7);
-  color: var(--text-dark);
+  gap: 8px;
+  width: fit-content;
+  margin: 0 auto 20px;
+  background: transparent;
+  border: 1px solid #111;
+  border-radius: 40px;
+  padding: 6px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111;
 }
-.service-icon-wrap svg { width: 30px; height: 30px; }
-.service-text { flex: 1; }
+
+
+/* Section Title */
+.services-section .section-title-center {
+  font-size: 48px;
+  max-width: 600px;
+  margin: 0 auto 60px;
+  text-align: center;
+  line-height: 1.15;
+  color: #1d1d1f;
+  font-family: var(--font-head);
+}
+
+/* 3 column grid */
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 32px;
+  max-width: 1040px;
+  margin: 0 auto;
+}
+
+/* Vertical card: text TOP, icon BOTTOM */
+.service-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background: #ffffff !important; 
+  border-radius: 36px;
+  padding: 48px 36px 40px;
+  box-shadow: 0 16px 48px rgba(0,0,0,0.03);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: default;
+  height: 100%;
+}
+.service-card:hover { 
+  transform: translateY(-4px); 
+  box-shadow: 0 24px 64px rgba(0,0,0,0.06);
+}
+
+.service-text { 
+  flex: 1; 
+  display: flex;
+  flex-direction: column;
+}
 .service-title {
   font-family: var(--font-head);
-  font-size: 17px;
+  font-size: 26px;
   font-weight: 800;
-  margin-bottom: 8px;
-  color: var(--text-dark);
+  margin-bottom: 24px;
+  color: #111;
+  line-height: 1.25;
+  text-align: center;
 }
 .service-desc {
-  font-size: 13.5px;
-  line-height: 1.65;
+  font-size: 15px;
+  line-height: 1.7;
   color: #555;
+  text-align: left;
+  margin-bottom: 40px;
 }
+.service-icon-wrap {
+  flex-shrink: 0;
+  margin-top: auto;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  color: #111;
+}
+
+/* --- SVG ANIMATIONS --- */
+.flowing-line {
+  stroke-dasharray: 8 8;
+  animation: flow-vertical 1.5s linear infinite;
+}
+.flowing-dash {
+  stroke-dasharray: 12 12;
+  animation: flow-horizontal 2s linear infinite;
+}
+.pulse-stroke {
+  animation: pulse-opac 2s ease-in-out infinite alternate;
+}
+
+@keyframes flow-vertical {
+  from { stroke-dashoffset: 16; }
+  to { stroke-dashoffset: 0; }
+}
+@keyframes flow-horizontal {
+  from { stroke-dashoffset: 24; }
+  to { stroke-dashoffset: 0; }
+}
+
+/* Lottie-style frame morphing */
+.frame-1 {
+  animation: fade-frame-1 3s infinite;
+}
+.frame-2 {
+  opacity: 0;
+  animation: fade-frame-2 3s infinite;
+}
+
+@keyframes fade-frame-1 {
+  0%, 45% { opacity: 1; }
+  50%, 95% { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes fade-frame-2 {
+  0%, 45% { opacity: 0; }
+  50%, 95% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
 /* CTA button below grid */
 .services-cta {
   text-align: center;

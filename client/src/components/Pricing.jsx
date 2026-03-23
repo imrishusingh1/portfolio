@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react'
-import { motion, useInView } from 'framer-motion'
-import { Link } from 'react-scroll'
-import { useSectionData } from '../context/SectionDataContext'
+import { motion, useInView, AnimatePresence } from 'framer-motion'
+import axios from 'axios'
+import { useSectionData, useAPI } from '../context/SectionDataContext'
 import './Pricing.css'
 
 const fallbackPlans = [
-  { price: '$500', badge: 'STARTER', badgeColor: '#f0ffdb', desc: 'You may want to add some details here for clarification.', features: ['Up to 5 Pages', 'Standard API Access', 'Basic Design Setup', 'Email Support', 'Single Language'], cta: 'Choose Plan' },
-  { price: "Let's Talk", badge: 'PRO', badgeColor: '#ffe3f5', desc: 'You may want to add some details here for clarification.', features: ['Unlimited Pages', 'Extended API Access', 'Custom Design Setup', 'Priority Support', 'Multilingual Ready'], cta: 'Choose Plan' },
+  { price: '$500', badge: 'STARTER', badgeColor: '#f0ffdb', desc: 'You may want to add some details here for clarification.', features: ['Up to 5 Pages', 'Standard API Access', 'Basic Design Setup', 'Email Support', 'Single Language'], cta: 'Choose Plan', amount: 500 },
+  { price: "Let's Talk", badge: 'PRO', badgeColor: '#ffe3f5', desc: 'You may want to add some details here for clarification.', features: ['Unlimited Pages', 'Extended API Access', 'Custom Design Setup', 'Priority Support', 'Multilingual Ready'], cta: 'Choose Plan', amount: null },
 ]
 
 const fallbackFaqs = [
@@ -20,13 +20,65 @@ export default function Pricing() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const [openFaq, setOpenFaq] = useState(null)
+  const [paymentState, setPaymentState] = useState({}) // { [planIndex]: 'loading' | 'success' | 'error' }
   const { data } = useSectionData('pricing')
+  const API = useAPI()
   
   const plans = data?.plans || fallbackPlans
   const faqs = data?.faqs || fallbackFaqs
 
-  const toggleFaq = (index) => {
-    setOpenFaq(openFaq === index ? null : index)
+  const toggleFaq = (index) => { setOpenFaq(openFaq === index ? null : index) }
+
+  const handleChoosePlan = async (plan, index) => {
+    // Derive amount from price string if not explicitly set (e.g. "$500" → 500)
+    const rawAmount = plan.amount ?? (
+      plan.price && /[\d,.]+/.test(plan.price)
+        ? parseFloat(plan.price.replace(/[^0-9.]/g, ''))
+        : null
+    )
+
+    // No numeric price → scroll to contact
+    if (!rawAmount) {
+      document.getElementById('contact')?.scrollIntoView({ behavior: 'smooth' })
+      return
+    }
+    setPaymentState(s => ({ ...s, [index]: 'loading' }))
+    try {
+      const { data: order } = await axios.post(`${API}/api/payment/create-order`, {
+        amount: rawAmount,
+        planName: `${plan.badge} Plan`,
+      })
+      const options = {
+        key: order.keyId,
+        amount: order.amount,
+        currency: order.currency,
+        name: 'Rishu Singh – Portfolio',
+        description: `${plan.badge} Plan`,
+        order_id: order.orderId,
+        handler: async (response) => {
+          try {
+            const { data: verify } = await axios.post(`${API}/api/payment/verify`, response)
+            if (verify.success) {
+              setPaymentState(s => ({ ...s, [index]: 'success' }))
+              setTimeout(() => setPaymentState(s => ({ ...s, [index]: undefined })), 5000)
+            } else {
+              setPaymentState(s => ({ ...s, [index]: 'error' }))
+            }
+          } catch { setPaymentState(s => ({ ...s, [index]: 'error' })) }
+        },
+        prefill: { name: '', email: '', contact: '' },
+        theme: { color: '#6c47ff' },
+        modal: {
+          ondismiss: () => setPaymentState(s => ({ ...s, [index]: undefined }))
+        },
+      }
+      const rzp = new window.Razorpay(options)
+      rzp.open()
+      setPaymentState(s => ({ ...s, [index]: undefined }))
+    } catch (err) {
+      console.error(err)
+      setPaymentState(s => ({ ...s, [index]: 'error' }))
+    }
   }
 
   return (
@@ -48,10 +100,14 @@ export default function Pricing() {
             </h2>
           </div>
           <div className="pricing-grid">
-          {plans.map(({ price, badge, badgeColor, desc, features, cta }, i) => (
+          {plans.map((plan, i) => {
+            const { price, badge, badgeColor, desc, features, cta } = plan
+            const pstate = paymentState[i]
+            return (
             <motion.div
               key={i}
               className="pricing-card"
+              style={{ borderTop: `6px solid ${badgeColor}` }}
               initial={{ opacity: 0, y: 28 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: i * 0.12, duration: 0.5 }}
@@ -64,9 +120,30 @@ export default function Pricing() {
                   <li key={f}><span className="check-icon">✓</span> {f}</li>
                 ))}
               </ul>
-              <button className="plan-choose-btn">{cta}</button>
+
+              {pstate === 'success' ? (
+                <motion.div 
+                  initial={{ scale: 0 }} animate={{ scale: 1 }}
+                  style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8 }}
+                >
+                  <motion.svg width="48" height="48" viewBox="0 0 52 52">
+                    <motion.circle cx="26" cy="26" r="25" fill="#22c55e" initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: 'spring', stiffness: 200 }} />
+                    <motion.path d="M16 26l7 7 15-15" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round" initial={{ pathLength: 0 }} animate={{ pathLength: 1 }} transition={{ duration: 0.4, delay: 0.3 }} />
+                  </motion.svg>
+                  <span style={{ fontWeight: 700, color: '#22c55e' }}>Payment Successful! 🎉</span>
+                </motion.div>
+              ) : (
+                <button 
+                  className="plan-choose-btn"
+                  disabled={pstate === 'loading'}
+                  onClick={() => handleChoosePlan(plan, i)}
+                >
+                  {pstate === 'loading' ? '⏳ Processing...' : (plan.amount ?? (/[\d,.]+/.test(plan.price || ''))) ? `Pay ${price}` : "Let's Talk →"}
+                </button>
+              )}
+              {pstate === 'error' && <p style={{ color: 'red', fontSize: 13, textAlign: 'center' }}>Payment failed. Please try again.</p>}
             </motion.div>
-          ))}
+          )})}
           </div>
 
           <div className="faq-section">

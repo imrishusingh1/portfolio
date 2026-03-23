@@ -60,9 +60,7 @@ export default function Hero() {
             <Link to="portfolio" smooth offset={-80} duration={600}>
               <button className="btn btn-outline hero-btn">{btnText}</button>
             </Link>
-            <a href="/resume.pdf" download>
-              <button className="btn btn-outline hero-btn">Download Resume ↓</button>
-            </a>
+            <a href="/resume.pdf" download className="btn btn-outline hero-btn">Download Resume ↓</a>
           </div>
         </motion.div>
 

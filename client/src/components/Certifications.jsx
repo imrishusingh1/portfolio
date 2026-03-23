@@ -34,7 +34,7 @@ export default function Certifications() {
               <motion.div
                 key={title + i}
                 className="cert-card"
-                style={{ background: bg }}
+                style={{ borderTop: `6px solid ${bg}` }}
                 initial={{ opacity: 0, y: 28 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: i * 0.08, duration: 0.5 }}

@@ -1,5 +1,5 @@
 .testimonials-section {
-  background: #ffffff;
+  background: #f7f3ee;
   padding: 0 !important; /* Override global .section padding so card bisects the border exactly */
   position: relative;
 }

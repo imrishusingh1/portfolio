@@ -1,4 +1,4 @@
-.portfolio-section { background: #ffffff; padding: 120px 0; border-bottom: 2px solid var(--text-dark); }
+.portfolio-section { background: #f7f3ee; padding: 120px 0; border-bottom: 2px solid var(--text-dark); }
 .portfolio-inner {
   max-width: 1140px;
   margin: 0 auto;
@@ -17,23 +17,35 @@
   text-decoration: none;
   color: inherit;
   outline: none;
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.project-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.08);
 }
 
 .project-image-box {
   height: 380px;
-  border-radius: var(--radius-card);
-  border: 1px solid var(--text-dark);
+  border-radius: 16px;
+  border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 80px;
   overflow: hidden;
-  transition: transform 0.25s ease;
-  box-shadow: none;
+  transition: transform 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
 }
 
 .project-card:hover .project-image-box {
-  transform: translateY(-6px);
+  transform: scale(1.02);
 }
 
 .project-info {

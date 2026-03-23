@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { useSectionData } from '../context/SectionDataContext'
+import { useSectionData, useAPI } from '../context/SectionDataContext'
 import './Achievements.css'
 
 const fallback = [
@@ -14,6 +14,7 @@ export default function Achievements() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const { data } = useSectionData('achievements')
+  const API = useAPI()
   const achievements = data?.items || fallback
 
   return (
@@ -28,17 +29,21 @@ export default function Achievements() {
           </div>
 
           <div className="achieve-grid">
-            {achievements.map(({ title, event, desc, badge, bg }, i) => (
+            {achievements.map(({ title, event, desc, badge, bg, image }, i) => (
               <motion.div
                 key={title + i}
                 className="achieve-card"
-                style={{ background: bg }}
+                style={{ borderTop: `6px solid ${bg}` }}
                 initial={{ opacity: 0, y: 28 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
               >
                 <div className="achieve-card-top">
-                  <span className="achieve-badge">{badge}</span>
+                  {image ? (
+                    <img src={`${API}${image}`} alt={title} className="achieve-image" />
+                  ) : (
+                    <span className="achieve-badge">{badge}</span>
+                  )}
                   <span className="achieve-event">{event}</span>
                 </div>
                 <h3 className="achieve-title">{title}</h3>
