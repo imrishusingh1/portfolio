@@ -1,50 +1,29 @@
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Link } from 'react-scroll'
+import { useSectionData } from '../context/SectionDataContext'
 import './Pricing.css'
 
-const plans = [
-  {
-    price: '$500',
-    badge: 'STARTER',
-    badgeColor: '#f0ffdb', // Light green
-    desc: 'You may want to add some details here for clarification.',
-    features: ['Up to 5 Pages', 'Standard API Access', 'Basic Design Setup', 'Email Support', 'Single Language'],
-    cta: 'Choose Plan',
-  },
-  {
-    price: "Let's Talk",
-    badge: 'STARTER',
-    badgeColor: '#ffe3f5', // Light pink
-    desc: 'You may want to add some details here for clarification.',
-    features: ['Unlimited Pages', 'Extended API Access', 'Custom Design Setup', 'Priority Support', 'Multilingual Ready'],
-    cta: 'Choose Plan',
-  },
+const fallbackPlans = [
+  { price: '$500', badge: 'STARTER', badgeColor: '#f0ffdb', desc: 'You may want to add some details here for clarification.', features: ['Up to 5 Pages', 'Standard API Access', 'Basic Design Setup', 'Email Support', 'Single Language'], cta: 'Choose Plan' },
+  { price: "Let's Talk", badge: 'PRO', badgeColor: '#ffe3f5', desc: 'You may want to add some details here for clarification.', features: ['Unlimited Pages', 'Extended API Access', 'Custom Design Setup', 'Priority Support', 'Multilingual Ready'], cta: 'Choose Plan' },
 ]
 
-const faqs = [
-  {
-    q: 'Do you charge hourly or on spec?',
-    a: "I typically charge on a per-project basis so you know exactly what you're paying upfront. However, I'm open to hourly arrangements for ongoing maintenance or consulting work.",
-  },
-  {
-    q: 'How long have you been doing design?',
-    a: "I have been designing and building digital products for over 5 years, working with startups and established brands to deliver high-quality, scalable solutions.",
-  },
-  {
-    q: 'Can you do a couple of designs to see if I like what you do?',
-    a: "I don't offer spec work as my process requires deep discovery and research first. However, you can review my extensive portfolio to get a strong sense of my style and quality.",
-  },
-  {
-    q: 'What is the process and how long does it take?',
-    a: "A typical project takes 2 to 6 weeks depending on scope. We go through discovery, wireframing, high-fidelity design, development, and finally launch and hand-off.",
-  },
+const fallbackFaqs = [
+  { q: 'Do you charge hourly or on spec?', a: "I typically charge on a per-project basis so you know exactly what you're paying upfront. However, I'm open to hourly arrangements for ongoing maintenance or consulting work." },
+  { q: 'How long have you been doing design?', a: "I have been designing and building digital products for over 5 years, working with startups and established brands to deliver high-quality, scalable solutions." },
+  { q: 'Can you do a couple of designs to see if I like what you do?', a: "I don't offer spec work as my process requires deep discovery and research first. However, you can review my extensive portfolio to get a strong sense of my style and quality." },
+  { q: 'What is the process and how long does it take?', a: "A typical project takes 2 to 6 weeks depending on scope. We go through discovery, wireframing, high-fidelity design, development, and finally launch and hand-off." },
 ]
 
 export default function Pricing() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const [openFaq, setOpenFaq] = useState(null)
+  const { data } = useSectionData('pricing')
+  
+  const plans = data?.plans || fallbackPlans
+  const faqs = data?.faqs || fallbackFaqs
 
   const toggleFaq = (index) => {
     setOpenFaq(openFaq === index ? null : index)
@@ -55,12 +34,9 @@ export default function Pricing() {
       <div className="container">
         <div className="pricing-inner">
           <div className="pricing-header" style={{ position: "relative", textAlign: "center", display: "flex", flexDirection: "column", alignItems: "center" }}>
-            {/* Left Star SVG */}
             <svg width="40" height="40" viewBox="0 0 100 100" fill="none" style={{ position: 'absolute', left: '10%', top: '30%' }}>
               <path d="M 50 10 L 56 40 L 90 35 L 65 58 L 75 90 L 50 70 L 25 90 L 35 58 L 10 35 L 44 40 Z" stroke="#1d1d1d" strokeWidth="2.5" strokeLinejoin="round" />
             </svg>
-            
-            {/* Right Hash SVG */}
             <svg width="40" height="40" viewBox="0 0 100 100" fill="none" style={{ position: 'absolute', right: '10%', top: '5%' }}>
               <path d="M 35 15 L 20 85 M 75 15 L 60 85 M 10 35 L 85 20 M 10 65 L 85 50" stroke="#1d1d1d" strokeWidth="2.5" strokeLinecap="round" />
             </svg>
@@ -93,7 +69,6 @@ export default function Pricing() {
           ))}
           </div>
 
-          {/* FAQ Section */}
           <div className="faq-section">
             <h2 className="faq-title">Have questions?</h2>
             <p className="faq-subtitle">
@@ -118,7 +93,6 @@ export default function Pricing() {
               ))}
             </div>
           </div>
-
         </div>
       </div>
     </section>

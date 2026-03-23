@@ -1,14 +1,35 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-scroll'
 import { FiX, FiMenu } from 'react-icons/fi'
 import { FaXTwitter, FaDribbble, FaInstagram } from 'react-icons/fa6'
+import { SectionDataCtx } from '../context/SectionDataContext'
 import './Navbar.css'
 
-const navLinks = ['Home', 'Services', 'About', 'Portfolio', 'Process', 'Pricing', 'Contact']
+const navLinks = ['Home', 'Services', 'About', 'Portfolio', 'Achievements', 'Blog', 'Pricing', 'Contact']
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const { sections } = useContext(SectionDataCtx)
+  
+  const keyMap = {
+    Home: 'hero',
+    Services: 'services',
+    About: 'experiences', // About and Experience are combined in About.jsx, we check experiences or about
+    Portfolio: 'portfolio',
+    Achievements: 'achievements',
+    Blog: 'blog',
+    Pricing: 'pricing',
+    Contact: 'contact'
+  }
+
+  const visibleLinks = navLinks.filter(link => {
+    if (!sections) return true
+    // the About section file contains both About and Experience blocks. 
+    // We can show the link if EITHER about or experiences is enabled.
+    if (link === 'About') return ('about' in sections || 'experiences' in sections)
+    return keyMap[link] in sections
+  })
 
   useEffect(() => {
     const h = () => setScrolled(window.scrollY > 10)
@@ -23,7 +44,7 @@ export default function Navbar() {
           <a href="#" className="nav-logo">Rishu Singh</a>
 
           <ul className={`nav-links ${open ? 'open' : ''}`}>
-            {navLinks.map((link) => (
+            {visibleLinks.map((link) => (
               <li key={link}>
                 <Link
                 to={link.toLowerCase()}

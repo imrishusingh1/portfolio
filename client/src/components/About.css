@@ -168,18 +168,20 @@
   content: '';
   position: absolute;
   top: 18px; /* start below dot */
-  bottom: -48px; /* extend to next item */
+  bottom: -64px; /* extend far enough to safely reach behind the next dot */
   width: 1.5px;
   background: var(--text-dark);
   opacity: 0.8;
+  z-index: 0;
 }
 .timeline-item:last-child .timeline-divider::after { display: none; }
 .timeline-dot {
   width: 14px; height: 14px;
   border-radius: 50%;
   border: 1.5px solid var(--text-dark);
-  z-index: 1;
-  background: #fff; /* fallback */
+  z-index: 2;
+  position: relative;
+  background: var(--lavender-bg); /* fallback */
 }
 .timeline-content { padding-left: 16px; }
 .timeline-role {

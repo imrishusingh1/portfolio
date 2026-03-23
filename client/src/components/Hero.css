@@ -31,6 +31,11 @@
   flex-direction: column;
   gap: 20px;
 }
+.hero-btns {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
 /* Large stylized HELLO text with SVG sparkles */
 .hero-hello-large {
   display: flex;

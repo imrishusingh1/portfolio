@@ -2,7 +2,7 @@ import { FaXTwitter, FaDribbble, FaInstagram, FaGithub, FaLinkedin } from 'react
 import { Link } from 'react-scroll'
 import './Footer.css'
 
-const navLinks = ['Home', 'Services', 'About', 'Portfolio', 'Process', 'Pricing', 'Contact']
+const navLinks = ['Home', 'Services', 'About', 'Portfolio', 'Achievements', 'Blog', 'Pricing', 'Contact']
 
 export default function Footer() {
   return (

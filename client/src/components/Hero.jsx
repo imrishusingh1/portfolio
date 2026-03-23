@@ -1,10 +1,17 @@
 import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { Link } from 'react-scroll'
+import { useSectionData, useAPI } from '../context/SectionDataContext'
 import './Hero.css'
 
 export default function Hero() {
   const [burstCount, setBurstCount] = useState(0)
+  const { data } = useSectionData('hero')
+  const headline = data?.headline || "I'm Rishu Singh,"
+  const subhead = data?.subhead || 'a product designer.'
+  const description = data?.description || "I'm a freelance product designer based in London.\nI'm very passionate about the work that I do."
+  const btnText = data?.btnText || 'See My Works'
+  const API = useAPI()
 
   const SparkleSVG = ({ size = 40, className = '' }) => (
     <svg className={className} width={size} height={size} viewBox="0 0 40 40" fill="none" style={{ flexShrink: 0 }}>
@@ -36,23 +43,27 @@ export default function Hero() {
             </div>
           </div>
           <h1 className="hero-headline">
-            I'm Rishu Singh,
+            {headline}
             <br />
             a{' '}
             <span className="wavy-word">
-              product designer.
+              {subhead}
               <svg className="wavy-svg" viewBox="0 0 260 20" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
                 <path d="M 5,6 Q 120,3 235,5 L 90,13 Q 180,15 250,15" stroke="#908aee" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
               </svg>
             </span>
           </h1>
           <p className="hero-sub">
-            I'm a freelance product designer based in London.<br />
-            I'm very passionate about the work that I do.
+            {description.split('\n').map((line, i) => <span key={i}>{line}{i < description.split('\n').length - 1 && <br />}</span>)}
           </p>
-          <Link to="portfolio" smooth offset={-80} duration={600}>
-            <button className="btn btn-outline hero-btn">See My Works</button>
-          </Link>
+          <div className="hero-btns">
+            <Link to="portfolio" smooth offset={-80} duration={600}>
+              <button className="btn btn-outline hero-btn">{btnText}</button>
+            </Link>
+            <a href="/resume.pdf" download>
+              <button className="btn btn-outline hero-btn">Download Resume ↓</button>
+            </a>
+          </div>
         </motion.div>
 
         {/* RIGHT PHOTO */}
@@ -104,7 +115,12 @@ export default function Hero() {
 
             {/* Arch photo */}
             <div className="hero-arch">
-              <img src="/profile.png" alt="Rishu Singh – Product Designer" className="hero-photo" />
+              <img 
+                src={`${API}/api/upload/profile-pic`} 
+                onError={(e) => { e.target.src = '/profile.png' }} 
+                alt="Rishu Singh – Product Designer" 
+                className="hero-photo" 
+              />
             </div>
 
             {/* Air / Wind decoration overlapping right edge */}

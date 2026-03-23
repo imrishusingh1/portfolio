@@ -1,26 +1,12 @@
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { useSectionData, useAPI } from '../context/SectionDataContext'
 import './About.css'
 
-const experiences = [
-  {
-    period: 'NOV 2017 – PRESENT',
-    role: 'Creative Director at Malory House',
-    desc: 'Led a talented team in crafting compelling brand experiences. Focused on innovation, creative direction, and delivering impactful digital solutions.',
-    dot: '#f5a0d0',
-  },
-  {
-    period: 'SEP 2015 – APR 2017',
-    role: 'Senior Developer at Longwave Studio',
-    desc: 'Collaborated with cross-functional teams to optimize performance and enhance user experience.',
-    dot: '#a0d0a0',
-  },
-  {
-    period: 'MAY 2015 – SEP 2015',
-    role: 'Junior Developer at Webpaint Media',
-    desc: 'Assisted in front-end development and UI enhancements. Contributed to coding, debugging and refining interactive website elements.',
-    dot: '#a0c0f5',
-  },
+const fallbackExperiences = [
+  { period: 'NOV 2017 – PRESENT', role: 'Creative Director at Malory House', desc: 'Led a talented team in crafting compelling brand experiences.', dot: '#f5a0d0' },
+  { period: 'SEP 2015 – APR 2017', role: 'Senior Developer at Longwave Studio', desc: 'Collaborated with cross-functional teams to optimize performance.', dot: '#a0d0a0' },
+  { period: 'MAY 2015 – SEP 2015', role: 'Junior Developer at Webpaint Media', desc: 'Assisted in front-end development and UI enhancements.', dot: '#a0c0f5' },
 ]
 
 export default function About() {
@@ -29,11 +15,18 @@ export default function About() {
   const refExp = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const inViewExp = useInView(refExp, { once: true, margin: '-80px' })
+  const { data: aboutData, enabled: aboutEnabled } = useSectionData('about')
+  const API = useAPI()
+  const experiences = aboutData?.experiences || fallbackExperiences
+  const aboutTitle = aboutData?.title || 'More about me'
+  const aboutBio = aboutData?.bio || "I'm Rishu Singh, a product designer based in London.\nI'm very passionate about the work that I do every day."
+  const aboutBioExt = aboutData?.bioExtended || 'My journey in this dynamic and ever-evolving field has been a testament to my passion for crafting meaningful user experiences.'
 
   return (
     <>
       {/* ── ABOUT BLOCK (lavender bg, circle photo) ── */}
-      <section className="about-section" id="about" ref={ref}>
+      {aboutEnabled && (
+        <section className="about-section" id="about" ref={ref}>
         {/* Decorative hearts */}
         <div className="hearts-deco">
           <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
@@ -60,7 +53,11 @@ export default function About() {
                 <path d="M 5 60 Q 15 70 25 60 T 45 60 T 65 60 T 85 60 T 105 60" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
               <div className="circle-photo">
-                <img src="/profile.png" alt="Rishu Singh" />
+                <img 
+                  src={`${API}/api/upload/profile-pic`} 
+                  onError={(e) => { e.target.src = '/profile.png' }} 
+                  alt="Rishu Singh" 
+                />
               </div>
               {/* Rotating badge */}
               <div
@@ -110,20 +107,16 @@ export default function About() {
             transition={{ duration: 0.7, delay: 0.1 }}
           >
             <div className="section-tag">✳ ABOUT</div>
-            <h2 className="section-title">More about me</h2>
-            <p>
-              I'm Rishu Singh, a product designer based in London.
-              I'm very passionate about the work that I do every day.
-            </p>
-            <p>
-              My journey in this dynamic and ever-evolving field has been a testament to my passion for crafting meaningful user experiences, leveraging technologies, and fearlessly pushing the boundaries of digital creativity. I thrive on transforming ideas into intuitive and impactful designs.
-            </p>
+            <h2 className="section-title">{aboutTitle}</h2>
+            <p>{aboutBio}</p>
+            <p>{aboutBioExt}</p>
           </motion.div>
         </div>
       </section>
+      )}
 
       {/* ── EXPERIENCE TIMELINE ── */}
-      <section className="experience-section" id="experience" ref={refExp}>
+        <section className="experience-section" id="experience" ref={refExp}>
         {/* Squiggle decoration */}
         <svg className="exp-squiggle" width="80" height="120" viewBox="0 0 80 120" fill="none">
           <path d="M40 5 Q60 30 40 50 Q20 70 40 90 Q60 110 40 115" stroke="#1d1d1d" strokeWidth="2.5" fill="none" opacity="0.35" strokeLinecap="round" />
@@ -149,7 +142,7 @@ export default function About() {
           <div className="timeline">
             {experiences.map(({ period, role, desc, dot }, i) => (
               <motion.div
-                key={role}
+                key={i}
                 className="timeline-item"
                 initial={{ opacity: 0, x: 28 }}
                 animate={inViewExp ? { opacity: 1, x: 0 } : {}}

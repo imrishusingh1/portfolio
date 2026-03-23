@@ -1,31 +1,69 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom'
+import { AuthProvider } from './context/AuthContext'
+import { SectionDataProvider, useSectionData } from './context/SectionDataContext'
 import './index.css'
+
 import Navbar from './components/Navbar'
 import Hero from './components/Hero'
 import Services from './components/Services'
 import About from './components/About'
 import Portfolio from './components/Portfolio'
 import Testimonials from './components/Testimonials'
+import Certifications from './components/Certifications'
+import Achievements from './components/Achievements'
+import OpenSource from './components/OpenSource'
 import Process from './components/Process'
+import Blog from './components/Blog'
+import Research from './components/Research'
 import Pricing from './components/Pricing'
 import Contact from './components/Contact'
 import Footer from './components/Footer'
 
-function App() {
+import AdminLogin from './pages/AdminLogin'
+import AdminDashboard from './pages/AdminDashboard'
+
+/* Wrapper that hides a section when it's disabled in the admin panel */
+function Section({ sectionKey, children }) {
+  const { enabled } = useSectionData(sectionKey)
+  if (!enabled) return null
+  return children
+}
+
+function PublicSite() {
   return (
-    <>
+    <SectionDataProvider>
       <Navbar />
       <main>
-        <Hero />
-        <Services />
+        <Section sectionKey="hero"><Hero /></Section>
+        <Section sectionKey="services"><Services /></Section>
         <About />
-        <Testimonials />
-        <Portfolio />
-        <Process />
-        <Pricing />
-        <Contact />
+        <Section sectionKey="about"><Testimonials /></Section>
+        <Section sectionKey="portfolio"><Portfolio /></Section>
+        <Section sectionKey="certifications"><Certifications /></Section>
+        <Section sectionKey="achievements"><Achievements /></Section>
+        <Section sectionKey="opensource"><OpenSource /></Section>
+        <Section sectionKey="process"><Process /></Section>
+        <Section sectionKey="blog"><Blog /></Section>
+        <Section sectionKey="research"><Research /></Section>
+        <Section sectionKey="pricing"><Pricing /></Section>
+        <Section sectionKey="contact"><Contact /></Section>
       </main>
       <Footer />
-    </>
+    </SectionDataProvider>
+  )
+}
+
+function App() {
+  return (
+    <BrowserRouter>
+      <AuthProvider>
+        <Routes>
+          <Route path="/admin" element={<AdminLogin />} />
+          <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="*" element={<PublicSite />} />
+        </Routes>
+      </AuthProvider>
+    </BrowserRouter>
   )
 }
 
