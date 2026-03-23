@@ -62,6 +62,11 @@ const defaultSections = {
     description: "I'm a freelance product designer based in London.\nI'm very passionate about the work that I do.",
     btnText: 'See My Works',
   },
+  navbar: {
+    useImage: true,
+    logoImage: '',
+    logoText: 'Rishu Singh',
+  },
   services: {
     items: [
       { title: 'Strategy & Planning', desc: 'Streamline your campaigns with tools that improve engagement, boost visibility, and help you reach your marketing goals.', bg: 'var(--lavender-bg)' },
@@ -82,9 +87,12 @@ const defaultSections = {
   },
   portfolio: {
     items: [
-      { title: 'Flavor Finder', description: 'A culinary discovery platform that helps users find recipes based on available ingredients.', emoji: '🍽️' },
-      { title: 'EcoTrack', description: 'Environmental tracking dashboard visualizing carbon footprint data in real-time.', emoji: '🌿' },
-      { title: 'SoundScape', description: 'An ambient soundscape generator that creates immersive audio environments.', emoji: '🎧' },
+      { title: 'TempMail Pro', description: 'A temporary email service built for privacy.', color: '#e3e3ff', emoji: '📧', image: '' },
+      { title: 'DevConnect Social Network', description: 'A platform connecting developers globally.', color: '#d4f5c4', emoji: '🌐', image: '' },
+      { title: 'TaskFlow AI Assistant', description: 'Intelligent task management using AI.', color: '#f5d4e8', emoji: '🤖', image: '' },
+      { title: 'EcomEase Storefront', description: 'High-conversion headless e-commerce.', color: '#d4e8f5', emoji: '🛒', image: '' },
+      { title: 'LeetCode Automation Solver', description: 'Automation script for algorithm solutions.', color: '#fff5d4', emoji: '⚡', image: '' },
+      { title: 'Creative Portfolio Engine', description: 'Open-source React portfolio template.', color: '#f5e3ff', emoji: '🎨', image: '' },
     ],
   },
   certifications: {

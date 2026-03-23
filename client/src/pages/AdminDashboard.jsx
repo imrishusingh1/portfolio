@@ -14,8 +14,10 @@ const SECTION_LABELS = {
   process: '🔄 Process',
   blog: '📝 Blog',
   research: '🔬 Research',
+  research: '🔬 Research',
   pricing: '💰 Pricing',
   contact: '📬 Contact',
+  navbar: '🧭 Navigation Bar',
 }
 
 export default function AdminDashboard() {
@@ -107,7 +109,6 @@ export default function AdminDashboard() {
     })
     if (res.ok) {
       showToast('Profile photo updated!')
-      // Force reload the image on the page
       setTimeout(() => window.location.reload(), 1000)
     } else {
       showToast('Upload failed')
@@ -288,6 +289,29 @@ function SectionEditor({ section, onSave, onToggle, saving }) {
     })
   }
 
+  async function handleImageUpload(path, file) {
+    if (!file) return
+    const fd = new FormData()
+    fd.append('image', file)
+    try {
+      const token = localStorage.getItem('admin_token')
+      const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+      const res = await fetch(`${API}/api/upload/image`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}` },
+        body: fd,
+      })
+      if (res.ok) {
+        const json = await res.json()
+        updateField(path, json.path)
+      } else {
+        alert('Upload failed')
+      }
+    } catch (e) {
+      alert('Upload error')
+    }
+  }
+
   return (
     <div className="admin-panel">
       <div className="admin-panel-header">
@@ -313,14 +337,14 @@ function SectionEditor({ section, onSave, onToggle, saving }) {
       </div>
 
       <div className="editor-fields">
-        {renderFields(data, '', updateField, addItem, removeItem)}
+        {renderFields(data, '', updateField, addItem, removeItem, handleImageUpload)}
       </div>
     </div>
   )
 }
 
 /* ── Recursive field renderer ── */
-function renderFields(obj, prefix, updateField, addItem, removeItem) {
+function renderFields(obj, prefix, updateField, addItem, removeItem, handleImageUpload) {
   if (obj === null || obj === undefined) return null
 
   return Object.entries(obj).map(([key, value]) => {
@@ -340,7 +364,7 @@ function renderFields(obj, prefix, updateField, addItem, removeItem) {
                 <button className="editor-remove-btn" onClick={() => removeItem(path, i)}>✕</button>
               </div>
               {typeof item === 'object' && item !== null
-                ? renderFields(item, `${path}.${i}`, updateField, addItem, removeItem)
+                ? renderFields(item, `${path}.${i}`, updateField, addItem, removeItem, handleImageUpload)
                 : (
                   <input
                     className="editor-input"
@@ -358,25 +382,30 @@ function renderFields(obj, prefix, updateField, addItem, removeItem) {
       return (
         <div key={path} className="editor-group">
           <h4>{formatLabel(key)}</h4>
-          {renderFields(value, path, updateField, addItem, removeItem)}
+          {renderFields(value, path, updateField, addItem, removeItem, handleImageUpload)}
         </div>
       )
     }
 
     if (typeof value === 'boolean') {
       return (
-        <label key={path} className="editor-field">
+        <div key={path} className="editor-field" style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <span>{formatLabel(key)}</span>
-          <input
-            type="checkbox"
-            checked={value}
-            onChange={e => updateField(path, e.target.checked)}
-          />
-        </label>
+          <label className="toggle-switch" style={{ margin: 0 }}>
+            <input
+              type="checkbox"
+              checked={value}
+              onChange={e => updateField(path, e.target.checked)}
+            />
+            <span className="toggle-slider" />
+          </label>
+        </div>
       )
     }
 
     const isLong = typeof value === 'string' && (value.length > 80 || value.includes('\n'))
+    const isImageField = key.toLowerCase().includes('image') || key.toLowerCase().includes('thumbnail') || key.toLowerCase() === 'img'
+
     return (
       <label key={path} className="editor-field">
         <span>{formatLabel(key)}</span>
@@ -388,11 +417,25 @@ function renderFields(obj, prefix, updateField, addItem, removeItem) {
             rows={3}
           />
         ) : (
-          <input
-            className="editor-input"
-            value={value ?? ''}
-            onChange={e => updateField(path, e.target.value)}
-          />
+          <div style={{ display: 'flex', gap: '8px', flex: 1 }}>
+            <input
+              className="editor-input"
+              value={value ?? ''}
+              onChange={e => updateField(path, e.target.value)}
+              style={isImageField ? { flex: 1 } : {}}
+            />
+            {isImageField && (
+              <label className="admin-upload-btn" style={{ padding: '0 12px', fontSize: '13px', cursor: 'pointer', whiteSpace: 'nowrap', display: 'flex', alignItems: 'center' }}>
+                Upload Image
+                <input 
+                  type="file" 
+                  accept="image/*" 
+                  style={{ display: 'none' }} 
+                  onChange={e => handleImageUpload(path, e.target.files[0])} 
+                />
+              </label>
+            )}
+          </div>
         )}
       </label>
     )

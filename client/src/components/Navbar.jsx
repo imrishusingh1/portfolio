@@ -10,8 +10,13 @@ const navLinks = ['Home', 'Services', 'About', 'Portfolio', 'Achievements', 'Blo
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
+  const [logoError, setLogoError] = useState(false)
   const { sections } = useContext(SectionDataCtx)
-  
+  const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+
+  const navbarSettings = sections?.navbar || { useImage: true, logoImage: '', logoText: 'Rishu Singh' }
+  const { useImage, logoImage, logoText } = navbarSettings
+
   const keyMap = {
     Home: 'hero',
     Services: 'services',
@@ -41,41 +46,59 @@ export default function Navbar() {
     <header className="header-wrapper">
       <nav className={`navbar ${scrolled ? 'scrolled' : ''}`}>
         <div className="nav-inner container">
-          <a href="#" className="nav-logo">Rishu Singh</a>
+          {useImage && logoImage && !logoError ? (
+            <a href="#" className="nav-logo" style={{ display: 'flex', alignItems: 'center' }}>
+              <img
+                src={`${API}${logoImage}`}
+                alt={logoText}
+                onError={() => setLogoError(true)}
+                onLoad={(e) => {
+                  const link = document.querySelector("link[rel*='icon']") || document.createElement('link')
+                  link.type = 'image/png'
+                  link.rel = 'icon'
+                  link.href = e.target.src
+                  document.head.appendChild(link)
+                }}
+                style={{ maxHeight: 48, objectFit: 'contain' }}
+              />
+            </a>
+          ) : (
+            <a href="#" className="nav-logo">{logoText}</a>
+          )}
 
           <ul className={`nav-links ${open ? 'open' : ''}`}>
             {visibleLinks.map((link) => (
               <li key={link}>
                 <Link
-                to={link.toLowerCase()}
-                smooth duration={600}
-                offset={-80}
-                spy
-                activeClass="active-link"
-                onClick={() => setOpen(false)}
-              >
-                {link}
-              </Link>
-            </li>
-          ))}
-        </ul>
+                  to={link.toLowerCase()}
+                  smooth duration={600}
+                  offset={-80}
+                  spy
+                  activeClass="active-link"
+                  onClick={() => setOpen(false)}
+                >
+                  {link}
+                </Link>
+              </li>
+            ))}
+          </ul>
 
-        <div className="nav-socials">
-          <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="X">
-            <FaXTwitter />
-          </a>
-          <a href="https://dribbble.com" target="_blank" rel="noreferrer" aria-label="Dribbble">
-            <FaDribbble />
-          </a>
-          <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
-            <FaInstagram />
-          </a>
+          <div className="nav-socials">
+            <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="X">
+              <FaXTwitter />
+            </a>
+            <a href="https://dribbble.com" target="_blank" rel="noreferrer" aria-label="Dribbble">
+              <FaDribbble />
+            </a>
+            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
+              <FaInstagram />
+            </a>
+          </div>
+
+          <button className="hamburger" onClick={() => setOpen(!open)} aria-label="Toggle menu">
+            {open ? <FiX /> : <FiMenu />}
+          </button>
         </div>
-
-        <button className="hamburger" onClick={() => setOpen(!open)} aria-label="Toggle menu">
-          {open ? <FiX /> : <FiMenu />}
-        </button>
-      </div>
       </nav>
     </header>
   )

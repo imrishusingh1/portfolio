@@ -1,7 +1,7 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { FiArrowRightCircle } from 'react-icons/fi'
-import { useSectionData } from '../context/SectionDataContext'
+import { useSectionData, useAPI } from '../context/SectionDataContext'
 import './Portfolio.css'
 
 const fallbackProjects = [
@@ -17,6 +17,7 @@ export default function Portfolio() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const { data } = useSectionData('portfolio')
+  const API = useAPI()
   const projects = data?.items || fallbackProjects
 
   return (
@@ -38,7 +39,7 @@ export default function Portfolio() {
           </div>
 
           <div className="portfolio-grid">
-            {projects.map(({ title, description, color, emoji }, i) => (
+            {projects.map(({ title, description, color, emoji, image }, i) => (
               <motion.a
                 key={title + i}
                 href="#"
@@ -47,8 +48,12 @@ export default function Portfolio() {
                 animate={inView ? { opacity: 1, y: 0 } : {}}
                 transition={{ delay: i * 0.08, duration: 0.5 }}
               >
-                <div className="project-image-box" style={{ background: color }}>
-                  <span className="project-emoji">{emoji}</span>
+                <div className="project-image-box" style={{ background: color, overflow: 'hidden' }}>
+                  {image ? (
+                    <img src={`${API}${image}`} alt={title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <span className="project-emoji">{emoji}</span>
+                  )}
                 </div>
                 <div className="project-info">
                   <h3 className="project-name">{title}</h3>
