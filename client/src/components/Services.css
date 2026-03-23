@@ -94,6 +94,16 @@
   background: transparent;
   color: #111;
 }
+.service-icon-gif {
+  width: 112px;
+  height: 112px;
+  object-fit: contain;
+  transform-origin: 50% 50%;
+  animation: icon-float 3.2s ease-in-out infinite;
+}
+.service-card:hover .service-icon-gif {
+  animation-duration: 1.6s;
+}
 
 /* --- SVG ANIMATIONS --- */
 .flowing-line {
@@ -119,11 +129,11 @@
 
 /* Lottie-style frame morphing */
 .frame-1 {
-  animation: fade-frame-1 3s infinite;
+  animation: fade-frame-1 2.4s ease-in-out infinite;
 }
 .frame-2 {
   opacity: 0;
-  animation: fade-frame-2 3s infinite;
+  animation: fade-frame-2 2.4s ease-in-out infinite;
 }
 
 @keyframes fade-frame-1 {
@@ -135,6 +145,10 @@
   0%, 45% { opacity: 0; }
   50%, 95% { opacity: 1; }
   100% { opacity: 0; }
+}
+@keyframes icon-float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }
 
 /* CTA button below grid */
