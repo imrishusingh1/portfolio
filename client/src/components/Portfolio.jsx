@@ -1,48 +1,43 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
+import { FiArrowRightCircle } from 'react-icons/fi'
 import './Portfolio.css'
 
 const projects = [
   {
     title: 'TempMail Pro',
-    category: 'Full-Stack',
+    description: 'A sleek, reliable temporary email service built for privacy and spam protection. Features a clean UI and automated inbox clearing.',
     color: '#e3e3ff',
-    img: null,
     emoji: '📧',
   },
   {
-    title: 'DevConnect',
-    category: 'Social Platform',
+    title: 'DevConnect Social Network',
+    description: 'A modern platform connecting developers globally, built with a scalable real-time messaging architecture and clean minimalist UI.',
     color: '#d4f5c4',
-    img: null,
     emoji: '🌐',
   },
   {
-    title: 'TaskFlow AI',
-    category: 'SaaS · AI',
+    title: 'TaskFlow AI Assistant',
+    description: 'An intelligent task management SaaS that uses AI to prioritize daily workflows and automate recurring scheduling conflicts.',
     color: '#f5d4e8',
-    img: null,
     emoji: '🤖',
   },
   {
-    title: 'EcomEase',
-    category: 'E-Commerce',
+    title: 'EcomEase Storefront',
+    description: 'A high-conversion headless e-commerce storefront designed for fast page loads, effortless checkout, and seamless inventory syncing.',
     color: '#d4e8f5',
-    img: null,
     emoji: '🛒',
   },
   {
-    title: 'LeetCode Solver',
-    category: 'Automation',
+    title: 'LeetCode Automation Solver',
+    description: 'A robust automation script capable of fetching, analyzing, and self-submitting optimal algorithm solutions using localized AI models.',
     color: '#fff5d4',
-    img: null,
     emoji: '⚡',
   },
   {
-    title: 'Portfolio Engine',
-    category: 'Open Source',
+    title: 'Creative Portfolio Engine',
+    description: 'An open-source, highly customizable React portfolio template focusing on neo-brutalist aesthetics and buttery smooth Framer Motion animations.',
     color: '#f5e3ff',
-    img: null,
     emoji: '🎨',
   },
 ]
@@ -74,24 +69,22 @@ export default function Portfolio() {
           </div>
   
           <div className="portfolio-grid">
-          {projects.map(({ title, category, color, emoji }, i) => (
+          {projects.map(({ title, description, color, emoji }, i) => (
             <motion.a
               key={title}
               href="#"
               className="project-card"
-              style={{ background: color }}
               initial={{ opacity: 0, y: 28 }}
               animate={inView ? { opacity: 1, y: 0 } : {}}
               transition={{ delay: i * 0.08, duration: 0.5 }}
-              whileHover={{ y: -4, transition: { duration: 0.18 } }}
             >
-              <div className="project-thumb">
+              <div className="project-image-box" style={{ background: color }}>
                 <span className="project-emoji">{emoji}</span>
               </div>
               <div className="project-info">
-                <span className="project-cat">{category}</span>
                 <h3 className="project-name">{title}</h3>
-                <span className="project-link">View Case Study →</span>
+                <p className="project-desc">{description}</p>
+                <span className="project-link">View Case Study <FiArrowRightCircle size={18} /></span>
               </div>
             </motion.a>
           ))}

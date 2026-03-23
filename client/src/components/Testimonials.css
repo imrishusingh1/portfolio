@@ -60,12 +60,12 @@
   z-index: 20;
 }
 .nav-prev {
-  left: 0;
-  transform: translate(-50%, -50%);
+  left: 32px;
+  transform: translateY(-50%);
 }
 .nav-next {
-  right: 0;
-  transform: translate(50%, -50%);
+  right: 32px;
+  transform: translateY(-50%);
 }
 .nav-btn:hover { opacity: 0.8; }
 
