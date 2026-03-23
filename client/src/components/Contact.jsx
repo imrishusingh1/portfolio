@@ -68,7 +68,7 @@ export default function Contact() {
             <div className="field-line">
               <textarea id="message" name="message" placeholder="Your Message" rows={4} value={form.message} onChange={handleChange} required />
             </div>
-            <button type="submit" className="btn btn-dark" disabled={status === 'sending'}>
+            <button type="submit" className="contact-submit-btn" disabled={status === 'sending'}>
               {status === 'sending' ? 'Sending…' : 'Send Message →'}
             </button>
             {status === 'ok' && <p className="feedback-ok">✅ Message sent! I'll reply shortly.</p>}

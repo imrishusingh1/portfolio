@@ -115,10 +115,6 @@ ul { list-style: none; }
   box-shadow: 0px 0px 0px var(--text-dark);
 }
 .btn-outline { background: var(--white); color: var(--text-dark); }
-.btn-outline:hover {
-  background: var(--text-dark);
-  color: var(--white);
-}
 .btn-dark { background: var(--text-dark); color: var(--white); }
 
 @media (max-width: 768px) {

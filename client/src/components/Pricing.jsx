@@ -22,9 +22,33 @@ const plans = [
   },
 ]
 
+const faqs = [
+  {
+    q: 'Do you charge hourly or on spec?',
+    a: "I typically charge on a per-project basis so you know exactly what you're paying upfront. However, I'm open to hourly arrangements for ongoing maintenance or consulting work.",
+  },
+  {
+    q: 'How long have you been doing design?',
+    a: "I have been designing and building digital products for over 5 years, working with startups and established brands to deliver high-quality, scalable solutions.",
+  },
+  {
+    q: 'Can you do a couple of designs to see if I like what you do?',
+    a: "I don't offer spec work as my process requires deep discovery and research first. However, you can review my extensive portfolio to get a strong sense of my style and quality.",
+  },
+  {
+    q: 'What is the process and how long does it take?',
+    a: "A typical project takes 2 to 6 weeks depending on scope. We go through discovery, wireframing, high-fidelity design, development, and finally launch and hand-off.",
+  },
+]
+
 export default function Pricing() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
+  const [openFaq, setOpenFaq] = useState(null)
+
+  const toggleFaq = (index) => {
+    setOpenFaq(openFaq === index ? null : index)
+  }
 
   return (
     <section className="section pricing-section" id="pricing" ref={ref}>
@@ -68,6 +92,33 @@ export default function Pricing() {
             </motion.div>
           ))}
           </div>
+
+          {/* FAQ Section */}
+          <div className="faq-section">
+            <h2 className="faq-title">Have questions?</h2>
+            <p className="faq-subtitle">
+              I've gathered common questions and their answers to make your experience<br/>
+              smoother. If you can't find what you're looking for, feel free to reach out to me.
+            </p>
+            <div className="faq-list">
+              {faqs.map((faq, index) => (
+                <div 
+                  key={index} 
+                  className={`faq-item ${openFaq === index ? 'open' : ''}`}
+                  onClick={() => toggleFaq(index)}
+                >
+                  <div className="faq-q-row">
+                    <h4 className="faq-q">{faq.q}</h4>
+                    <span className="faq-icon">{openFaq === index ? '−' : '+'}</span>
+                  </div>
+                  <div className="faq-a-wrap">
+                    <p className="faq-a">{faq.a}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
         </div>
       </div>
     </section>
