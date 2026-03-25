@@ -43,6 +43,16 @@ router.get('/resume/status', (_req, res) => {
   res.json({ exists: fs.existsSync(resumePath) })
 })
 
+// Download resume
+router.get('/download-resume', (req, res) => {
+  const resumePath = path.join(uploadsDir, 'resume.pdf')
+  if (fs.existsSync(resumePath)) {
+    res.download(resumePath, 'resume.pdf')
+  } else {
+    res.status(404).send('Resume not found')
+  }
+})
+
 // Configure multer for profile pictures
 const storageProfile = multer.diskStorage({
   destination: (_req, _file, cb) => cb(null, uploadsDir),

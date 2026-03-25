@@ -12,7 +12,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false)
   const [logoError, setLogoError] = useState(false)
   const { sections } = useContext(SectionDataCtx)
-  const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const API = import.meta.env.VITE_API_URL || 'https://api.rishusingh.me'
 
   const navbarSettings = sections?.navbar || { useImage: true, logoImage: '', logoText: 'Rishu Singh' }
   const { useImage, logoImage, logoText } = navbarSettings

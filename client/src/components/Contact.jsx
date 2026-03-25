@@ -21,7 +21,7 @@ export default function Contact() {
     e.preventDefault()
     setStatus('sending')
     try {
-      await axios.post('http://localhost:5000/api/contact', form)
+      await axios.post('https://api.rishusingh.me/api/contact', form)
       setStatus('animating')
       setAnimStage('folding')
       setTimeout(() => setAnimStage('closing'), 1200)
