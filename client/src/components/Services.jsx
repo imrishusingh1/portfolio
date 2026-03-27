@@ -1,27 +1,14 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { Link } from 'react-scroll'
-import { useSectionData } from '../context/SectionDataContext'
-import cloudGif from '../assets/cloud.gif'
-import nodeGif from '../assets/node.gif'
-import sysGif from '../assets/sys.gif'
+import { useSectionData, useAPI } from '../context/SectionDataContext'
 import './Services.css'
 
-const flowDefs = (
-  <defs>
-    <linearGradient id="flowGrad" x1="0%" y1="0%" x2="200%" y2="0%">
-      <stop offset="0%" stopColor="#00b8ff" />
-      <stop offset="25%" stopColor="#1dc2a4" />
-      <stop offset="50%" stopColor="#00b8ff" />
-      <stop offset="75%" stopColor="#1dc2a4" />
-      <stop offset="100%" stopColor="#00b8ff" />
-      <animate attributeName="x1" from="0%" to="-200%" dur="3s" repeatCount="indefinite" />
-      <animate attributeName="x2" from="200%" to="0%" dur="3s" repeatCount="indefinite" />
-    </linearGradient>
-  </defs>
-)
+const webDevGif = 'https://media.tenor.com/jdSFsfznMaIAAAAC/services-webdevelopment.gif';
+const backendGif = 'https://media.tenor.com/e2VK6sB1TX0AAAAC/online-server.gif';
+const archGif = 'https://media.tenor.com/MmfoddcK1QAAAAAC/ace-data-cloud.gif';
 
-const defaultIcons = [nodeGif, cloudGif, sysGif]
+const defaultIcons = [webDevGif, backendGif, archGif]
 
 const fallbackServices = [
   { title: 'Distributed Systems & Scalability', desc: 'Scalable architectures handling concurrent connections. Optimized system availability using microservices and event-driven patterns.', bg: '#ffffff' },
@@ -29,11 +16,23 @@ const fallbackServices = [
   { title: 'High-Performance REST APIs', desc: 'Robust Node.js server-side logic and optimized MongoDB schemas, reducing data retrieval latency by 35% across production apps.', bg: '#ffffff' },
 ]
 
+function pickDefaultIcon(title = '') {
+  const t = String(title).toLowerCase()
+  if (t.includes('aws') || t.includes('cloud') || t.includes('devops') || t.includes('infra')) return archGif
+  if (t.includes('api') || t.includes('backend') || t.includes('node') || t.includes('server')) return backendGif
+  if (t.includes('system') || t.includes('scal') || t.includes('arch')) return archGif
+  return webDevGif
+}
+
 export default function Services() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const { data } = useSectionData('services')
   const services = data?.items || fallbackServices
+  const API = useAPI()
+  const heading =
+    data?.heading ||
+    'The service I offer is specifically\ndesigned to meet your needs.'
 
   return (
     <section className="section services-section" id="services" ref={ref}>
@@ -44,11 +43,21 @@ export default function Services() {
       <div className="container">
         <div className="section-tag services-tag">✳ MY SERVICES</div>
         <h2 className="section-title-center">
-          The service I offer is specifically<br />designed to meet your needs.
+          {heading.split('\n').map((line, i) => (
+            <span key={i}>
+              {line}
+              {i < heading.split('\n').length - 1 && <br />}
+            </span>
+          ))}
         </h2>
 
         <div className="services-grid">
-          {services.map(({ title, desc, bg }, i) => (
+          {services.map(({ title, desc, bg, img }, i) => {
+            const iconSrc = img
+              ? (img.startsWith('http') ? img : `${API}${img}`)
+              : pickDefaultIcon(title)
+
+            return (
             <motion.div
               key={title + i}
               className="service-card"
@@ -64,13 +73,14 @@ export default function Services() {
               </div>
               <div className="service-icon-wrap">
                 <img
-                  src={defaultIcons[i % defaultIcons.length]}
+                  src={iconSrc}
                   alt={`${title} icon`}
                   className="service-icon-gif"
                 />
               </div>
             </motion.div>
-          ))}
+            )
+          })}
         </div>
 
         <div className="services-cta">

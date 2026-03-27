@@ -1,0 +1,20 @@
+server sticker:
+0: https://media.tenor.com/9IjqqTrJDM4AAAAC/laughing-hutao.gif
+1: https://media.tenor.com/0cQ0vFmu5SsAAAAC/love-nsgcraft.gif
+2: https://media.tenor.com/HLQl2jUsDi4AAAAC/resign-trump-trump.gif
+3: https://media.tenor.com/YmxR9ncB4pQAAAAC/welcome.gif
+4: https://media.tenor.com/8KTtuzf6xjEAAAAC/sever-mj.gif
+
+database sticker:
+0: https://media.tenor.com/Wz8frTKrU5cAAAAC/ok-sticker-okay-sticker.gif
+1: https://media.tenor.com/P6jNf-EYt3YAAAAC/sticker.gif
+2: https://media.tenor.com/vQ22XlmaFY4AAAAC/ok-sticker-okay-sticker.gif
+3: https://media.tenor.com/lbVYgbiPX3wAAAAC/stickergiant-national-sticker-day.gif
+4: https://media.tenor.com/xXTUdknRBAwAAAAC/stickergiant-national-sticker-day.gif
+
+coding sticker:
+0: https://media.tenor.com/29Hafpo0gwUAAAAC/mdn-web-docs-programming.gif
+1: https://media.tenor.com/m2B-tIfIwQ4AAAAC/inspiration-cliphy.gif
+2: https://media.tenor.com/g0Zz7oEuPmUAAAAC/sappy-seals.gif
+3: https://media.tenor.com/v36Vlu3LXnsAAAAC/kstr-kochstrasse.gif
+4: https://media.tenor.com/qY3HUQW-XwoAAAAC/empty-assignment.gif

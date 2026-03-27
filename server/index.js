@@ -99,11 +99,12 @@ const defaultSections = {
     logoText: 'Rishu Singh',
   },
   services: {
+    heading: 'The service I offer is specifically\ndesigned to meet your needs.',
     items: [
-      { title: 'Strategy & Planning', desc: 'Streamline your campaigns with tools that improve engagement, boost visibility, and help you reach your marketing goals.', bg: 'var(--lavender-bg)' },
-      { title: 'User Research', desc: 'Simplify project workflows with organized tools and strategies designed to keep your team aligned and productive.', bg: 'var(--green-pastel)' },
-      { title: 'Web Design', desc: 'Gain valuable insights into user behavior, website performance, and key business metrics to optimize your digital presence.', bg: 'var(--pink-pastel)' },
-      { title: 'Brand Design', desc: 'Understand your market with precise data analysis and deep customer insights that guide your decision-making processes.', bg: 'var(--blue-pastel)' },
+      { title: 'Strategy & Planning', desc: 'Streamline your campaigns with tools that improve engagement, boost visibility, and help you reach your marketing goals.', bg: 'var(--lavender-bg)', img: '' },
+      { title: 'User Research', desc: 'Simplify project workflows with organized tools and strategies designed to keep your team aligned and productive.', bg: 'var(--green-pastel)', img: '' },
+      { title: 'Web Design', desc: 'Gain valuable insights into user behavior, website performance, and key business metrics to optimize your digital presence.', bg: 'var(--pink-pastel)', img: '' },
+      { title: 'Brand Design', desc: 'Understand your market with precise data analysis and deep customer insights that guide your decision-making processes.', bg: 'var(--blue-pastel)', img: '' },
     ],
   },
   about: {
@@ -191,12 +192,65 @@ const defaultSections = {
   },
 }
 
+function isPlainObject(v) {
+  return v !== null && typeof v === 'object' && !Array.isArray(v)
+}
+
+function mergeMissing(target, defaults) {
+  // If defaults is an array template (e.g. items), fill missing keys
+  // on each object element without changing the array contents.
+  if (Array.isArray(target) && Array.isArray(defaults)) {
+    const template = defaults[0]
+    if (isPlainObject(template)) {
+      let changed = false
+      for (const el of target) {
+        if (isPlainObject(el)) {
+          if (mergeMissing(el, template)) changed = true
+        }
+      }
+      return changed
+    }
+    return false
+  }
+
+  if (!isPlainObject(target) || !isPlainObject(defaults)) return false
+  let changed = false
+
+  for (const [k, defVal] of Object.entries(defaults)) {
+    const curVal = target[k]
+
+    if (curVal === undefined) {
+      target[k] = defVal
+      changed = true
+      continue
+    }
+
+    if (
+      (isPlainObject(curVal) && isPlainObject(defVal)) ||
+      (Array.isArray(curVal) && Array.isArray(defVal))
+    ) {
+      if (mergeMissing(curVal, defVal)) changed = true
+    }
+  }
+
+  return changed
+}
+
 async function seedSections() {
   for (const [key, data] of Object.entries(defaultSections)) {
     const exists = await Section.findOne({ sectionKey: key })
     if (!exists) {
       await Section.create({ sectionKey: key, enabled: true, data })
       console.log(`  🌱 Seeded section: ${key}`)
+    } else {
+      const copy = JSON.parse(JSON.stringify(exists.data || {}))
+      const changed = mergeMissing(copy, data)
+      if (changed) {
+        exists.data = copy
+        exists.updatedAt = new Date()
+        await exists.save()
+        console.log(`  🧩 Filled missing defaults: ${key}`)
+      }
     }
   }
 }

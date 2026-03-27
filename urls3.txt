@@ -1,0 +1,14 @@
+cloud network transparent:
+0: https://media.tenor.com/MmfoddcK1QAAAAAC/ace-data-cloud.gif
+1: https://media.tenor.com/BpnaWEBTtHUAAAAC/cloud-rp-cloud-moment.gif
+2: https://media.tenor.com/dF2FjVr-3IAAAAAC/signing-cloud-secure-metric.gif
+
+web programming transparent:
+0: https://media.tenor.com/jdSFsfznMaIAAAAC/services-webdevelopment.gif
+1: https://media.tenor.com/mlOsD0CKYjUAAAAC/code-programming.gif
+2: https://media.tenor.com/7ZCJ1sbn9k4AAAAC/program-computer-program.gif
+
+database server transparent:
+0: https://media.tenor.com/UXAm0KipxZ8AAAAC/minecraft-server-restarting.gif
+1: https://media.tenor.com/e2VK6sB1TX0AAAAC/online-server.gif
+2: https://media.tenor.com/1FO2mN0_0pwAAAAC/catzo-goodbye-server.gif

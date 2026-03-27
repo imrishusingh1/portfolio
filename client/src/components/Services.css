@@ -27,13 +27,15 @@
 
 /* Section Title */
 .services-section .section-title-center {
-  font-size: 48px;
-  max-width: 600px;
-  margin: 0 auto 60px;
+  font-size: clamp(30px, 3.6vw, 52px);
+  max-width: clamp(560px, 70vw, 860px);
+  margin: 0 auto clamp(36px, 4.2vw, 60px);
   text-align: center;
-  line-height: 1.15;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
   color: #1d1d1f;
   font-family: var(--font-head);
+  text-wrap: balance;
 }
 
 /* 3 column grid */
