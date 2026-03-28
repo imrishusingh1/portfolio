@@ -27,8 +27,9 @@ export default function Process() {
             </svg>
             <div className="section-tag" style={{ margin: "0 auto 24px" }}>✳ PROCESS</div>
             <h2 className="section-title-center">
-              My workflow is centered around<br/>
-              being highly productive.
+              My development process focuses on building scalable and efficient systems.
+              {/* My workflow is centered around<br />
+              being highly productive. */}
             </h2>
           </div>
           <div className="process-grid">

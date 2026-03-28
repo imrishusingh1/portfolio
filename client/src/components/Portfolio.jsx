@@ -1,6 +1,5 @@
 import { useRef } from 'react'
 import { motion, useInView } from 'framer-motion'
-import { FiArrowRightCircle } from 'react-icons/fi'
 import { useSectionData, useAPI } from '../context/SectionDataContext'
 import './Portfolio.css'
 
@@ -13,12 +12,37 @@ const fallbackProjects = [
   { title: 'Creative Portfolio Engine', description: 'Open-source React portfolio template.', color: '#f5e3ff', emoji: '🎨' },
 ]
 
+const fallbackSkills = [
+  { name: 'C Language', iconImage: '' },
+  { name: 'C++', iconImage: '' },
+  { name: 'Java', iconImage: '' },
+  { name: 'Python', iconImage: '' },
+  { name: 'TypeScript', iconImage: '' },
+  { name: 'Express', iconImage: '' },
+  { name: 'NodeJS', iconImage: '' },
+  { name: 'Postman', iconImage: '' },
+  { name: 'Docker', iconImage: '' },
+  { name: 'HTML', iconImage: '' },
+  { name: 'CSS', iconImage: '' },
+  { name: 'Redux', iconImage: '' },
+  { name: 'Javascript', iconImage: '' },
+  { name: 'Tailwind CSS', iconImage: '' },
+  { name: 'React', iconImage: '' },
+  { name: 'MySQL', iconImage: '' },
+  { name: 'Mongo DB', iconImage: '' },
+  { name: 'Git', iconImage: '' },
+  { name: 'Firebase', iconImage: '' },
+]
+
 export default function Portfolio() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
   const { data } = useSectionData('portfolio')
   const API = useAPI()
   const projects = data?.items || fallbackProjects
+  const skillsTitle = data?.skillsTitle || 'Technologies and Tools'
+  const skillsDescription = data?.skillsDescription || 'Using a combination of cutting-edge technologies and reliable open-source software I build user-focused, performant apps and websites for smartphones, tablets, and desktops.'
+  const skills = data?.skills || fallbackSkills
 
   return (
     <section className="section portfolio-section" id="portfolio" ref={ref}>
@@ -58,10 +82,40 @@ export default function Portfolio() {
                 <div className="project-info">
                   <h3 className="project-name">{title}</h3>
                   <p className="project-desc">{description}</p>
-                  <span className="project-link">View Case Study <FiArrowRightCircle size={18} /></span>
                 </div>
               </motion.a>
             ))}
+          </div>
+
+          {/* Skills Section */}
+          <div className="portfolio-skills" style={{ marginTop: "120px" }}>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={inView ? { opacity: 1, y: 0 } : {}}
+              transition={{ duration: 0.5 }}
+            >
+              <h2 className="skills-title">{skillsTitle}</h2>
+              <p className="skills-desc">{skillsDescription}</p>
+            </motion.div>
+            
+            <div className="skills-grid">
+              {skills.map((skill, i) => (
+                <motion.div
+                  key={i}
+                  className="skill-card"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: i * 0.04, duration: 0.4 }}
+                >
+                  {skill.iconImage ? (
+                    <img src={`${API}${skill.iconImage}`} alt={skill.name} className="skill-icon" />
+                  ) : (
+                    <div className="skill-icon-placeholder">{skill.name.charAt(0)}</div>
+                  )}
+                  <span className="skill-name">{skill.name}</span>
+                </motion.div>
+              ))}
+            </div>
           </div>
         </div>
       </div>

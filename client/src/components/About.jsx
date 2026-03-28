@@ -21,102 +21,103 @@ export default function About() {
   const aboutTitle = aboutData?.title || 'More about me'
   const aboutBio = aboutData?.bio || "I'm Rishu Singh, a product designer based in London.\nI'm very passionate about the work that I do every day."
   const aboutBioExt = aboutData?.bioExtended || 'My journey in this dynamic and ever-evolving field has been a testament to my passion for crafting meaningful user experiences.'
+  const experiencesDescription = aboutData?.experiencesDescription || "I have had the pleasure to work with companies across a variety of industries. I'm always interested in new, exciting and challenging adventures."
 
   return (
     <>
       {/* ── ABOUT BLOCK (lavender bg, circle photo) ── */}
       {aboutEnabled && (
         <section className="about-section" id="about" ref={ref}>
-        {/* Decorative hearts */}
-        <div className="hearts-deco">
-          <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
-            <path d="M22 18 Q22 10 30 16 Q38 10 38 18 Q38 28 30 34 Q22 28 22 18Z" stroke="#1d1d1d" strokeWidth="1.5" fill="none" />
-          </svg>
-          <svg width="40" height="40" viewBox="0 0 60 60" fill="none">
-            <path d="M22 18 Q22 10 30 16 Q38 10 38 18 Q38 28 30 34 Q22 28 22 18Z" stroke="#1d1d1d" strokeWidth="1.5" fill="none" />
-          </svg>
-        </div>
+          {/* Decorative hearts */}
+          <div className="hearts-deco">
+            <svg width="60" height="60" viewBox="0 0 60 60" fill="none">
+              <path d="M22 18 Q22 10 30 16 Q38 10 38 18 Q38 28 30 34 Q22 28 22 18Z" stroke="#1d1d1d" strokeWidth="1.5" fill="none" />
+            </svg>
+            <svg width="40" height="40" viewBox="0 0 60 60" fill="none">
+              <path d="M22 18 Q22 10 30 16 Q38 10 38 18 Q38 28 30 34 Q22 28 22 18Z" stroke="#1d1d1d" strokeWidth="1.5" fill="none" />
+            </svg>
+          </div>
 
-        <div className="container about-inner">
-          {/* LEFT: circle photo */}
-          <motion.div
-            className="about-photo-wrap"
-            initial={{ opacity: 0, x: -32 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7 }}
-          >
-            <div className="circle-photo-outer">
-              {/* Air/Wave decoration */}
-              <svg className="wave-deco" width="110" height="80" viewBox="0 0 110 80" fill="none">
-                <path d="M 5 20 Q 15 30 25 20 T 45 20 T 65 20 T 85 20 T 105 20" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 5 40 Q 15 50 25 40 T 45 40 T 65 40 T 85 40 T 105 40" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-                <path d="M 5 60 Q 15 70 25 60 T 45 60 T 65 60 T 85 60 T 105 60" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-              <div className="circle-photo">
-                <img 
-                  src={`${API}/api/upload/profile-pic`} 
-                  onError={(e) => { e.target.src = '/profile.png' }} 
-                  alt="Rishu Singh" 
-                />
-              </div>
-              {/* Rotating badge */}
-              <div
-                className="exp-badge"
-                onMouseEnter={() => setBurstCount(c => c + 1)}
-                onMouseLeave={() => setBurstCount(c => c - 1)}
-                onClick={() => setBurstCount(c => c + 1)}
-              >
-                <div className="exp-badge-ring">
-                  <div
-                    className="badge-burst"
-                    style={{
-                      transition: 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                      transform: `rotate(${burstCount * 360}deg)`,
-                      position: 'absolute', inset: 0
-                    }}
-                  >
-                    <div className="badge-continuous">
-                      <svg viewBox="0 0 130 130" width="130" height="130">
-                        <defs>
-                          <path id="expCircle" d="M 65,65 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" />
-                        </defs>
-                        <text fontSize="10" fontWeight="700" fill="#1d1d1d" letterSpacing="2.5" fontFamily="Cabinet Grotesk, sans-serif">
-                          <textPath href="#expCircle">
-                            ✦ 10+ YEARS OF ✦ WORK EXPERIENCE ✦&nbsp;
-                          </textPath>
-                        </text>
+          <div className="container about-inner">
+            {/* LEFT: circle photo */}
+            <motion.div
+              className="about-photo-wrap"
+              initial={{ opacity: 0, x: -32 }}
+              animate={inView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.7 }}
+            >
+              <div className="circle-photo-outer">
+                {/* Air/Wave decoration */}
+                <svg className="wave-deco" width="110" height="80" viewBox="0 0 110 80" fill="none">
+                  <path d="M 5 20 Q 15 30 25 20 T 45 20 T 65 20 T 85 20 T 105 20" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M 5 40 Q 15 50 25 40 T 45 40 T 65 40 T 85 40 T 105 40" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M 5 60 Q 15 70 25 60 T 45 60 T 65 60 T 85 60 T 105 60" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                <div className="circle-photo">
+                  <img
+                    src={`${API}/api/upload/profile-pic`}
+                    onError={(e) => { e.target.src = '/profile.png' }}
+                    alt="Rishu Singh"
+                  />
+                </div>
+                {/* Rotating badge */}
+                <div
+                  className="exp-badge"
+                  onMouseEnter={() => setBurstCount(c => c + 1)}
+                  onMouseLeave={() => setBurstCount(c => c - 1)}
+                  onClick={() => setBurstCount(c => c + 1)}
+                >
+                  <div className="exp-badge-ring">
+                    <div
+                      className="badge-burst"
+                      style={{
+                        transition: 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                        transform: `rotate(${burstCount * 360}deg)`,
+                        position: 'absolute', inset: 0
+                      }}
+                    >
+                      <div className="badge-continuous">
+                        <svg viewBox="0 0 130 130" width="130" height="130">
+                          <defs>
+                            <path id="expCircle" d="M 65,65 m -44,0 a 44,44 0 1,1 88,0 a 44,44 0 1,1 -88,0" />
+                          </defs>
+                          <text fontSize="10" fontWeight="700" fill="#1d1d1d" letterSpacing="2.5" fontFamily="Cabinet Grotesk, sans-serif">
+                            <textPath href="#expCircle">
+                              ✦ 10+ YEARS OF ✦ WORK EXPERIENCE ✦&nbsp;
+                            </textPath>
+                          </text>
+                        </svg>
+                      </div>
+                    </div>
+                    <div className="badge-center">
+                      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <line x1="7" y1="17" x2="17" y2="7"></line>
+                        <polyline points="7 7 17 7 17 17"></polyline>
                       </svg>
                     </div>
                   </div>
-                  <div className="badge-center">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      <line x1="7" y1="17" x2="17" y2="7"></line>
-                      <polyline points="7 7 17 7 17 17"></polyline>
-                    </svg>
-                  </div>
                 </div>
               </div>
-            </div>
-          </motion.div>
+            </motion.div>
 
-          {/* RIGHT: text */}
-          <motion.div
-            className="about-text"
-            initial={{ opacity: 0, x: 32 }}
-            animate={inView ? { opacity: 1, x: 0 } : {}}
-            transition={{ duration: 0.7, delay: 0.1 }}
-          >
-            <div className="section-tag">✳ ABOUT</div>
-            <h2 className="section-title">{aboutTitle}</h2>
-            <p>{aboutBio}</p>
-            <p>{aboutBioExt}</p>
-          </motion.div>
-        </div>
-      </section>
+            {/* RIGHT: text */}
+            <motion.div
+              className="about-text"
+              initial={{ opacity: 0, x: 32 }}
+              animate={inView ? { opacity: 1, x: 0 } : {}}
+              transition={{ duration: 0.7, delay: 0.1 }}
+            >
+              <div className="section-tag">✳ ABOUT</div>
+              <h2 className="section-title">{aboutTitle}</h2>
+              <p>{aboutBio}</p>
+              <p>{aboutBioExt}</p>
+            </motion.div>
+          </div>
+        </section>
       )}
 
       {/* ── EXPERIENCE TIMELINE ── */}
-        <section className="experience-section" id="experience" ref={refExp}>
+      <section className="experience-section" id="experience" ref={refExp}>
         {/* Squiggle decoration */}
         <svg className="exp-squiggle" width="80" height="120" viewBox="0 0 80 120" fill="none">
           <path d="M40 5 Q60 30 40 50 Q20 70 40 90 Q60 110 40 115" stroke="#1d1d1d" strokeWidth="2.5" fill="none" opacity="0.35" strokeLinecap="round" />
@@ -131,11 +132,9 @@ export default function About() {
             animate={inViewExp ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="section-title">My experiences</h2>
-            <p>
-              I have had the pleasure to work with companies across a variety of industries. I'm always interested in new, exciting and challenging adventures.
-            </p>
-            <button className="btn btn-outline">More About Me</button>
+            <h2 className="section-title">My Journey</h2>
+            <p>{experiencesDescription}</p>
+            {/* <button className="btn btn-outline">More About Me</button> */}
           </motion.div>
 
           {/* RIGHT – vertical timeline */}

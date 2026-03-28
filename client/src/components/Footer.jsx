@@ -1,4 +1,4 @@
-import { FaXTwitter, FaDribbble, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa6'
+import { FaXTwitter, FaFacebookF, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa6'
 import { Link } from 'react-scroll'
 import './Footer.css'
 
@@ -18,9 +18,11 @@ export default function Footer() {
             ))}
           </nav>
           <div className="footer-socials">
-            <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
-            <a href="https://dribbble.com" target="_blank" rel="noreferrer" aria-label="Dribbble"><FaDribbble /></a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+            <a href="https://github.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="GitHub"><FaGithub /></a>
+            <a href="https://www.linkedin.com/in/imrishusingh1/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
+            <a href="https://x.com/imrishurajput1" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
+            <a href="https://facebook.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebookF /></a>
+            <a href="https://instagram.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
           </div>
         </div>
         <div className="footer-divider" />

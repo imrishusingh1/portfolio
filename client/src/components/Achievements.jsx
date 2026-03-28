@@ -24,7 +24,8 @@ export default function Achievements() {
           <div className="achieve-header" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="section-tag" style={{ margin: '0 auto 24px' }}>✳ ACHIEVEMENTS</div>
             <h2 className="section-title-center">
-              Competitive programming<br />& hackathon highlights.
+              {/* Competitive programming<br />& hackathon highlights. */}
+              Technical Achievements & Problem-Solving Highlights.
             </h2>
           </div>
 

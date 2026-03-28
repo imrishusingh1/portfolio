@@ -1,7 +1,7 @@
 import { useState, useEffect, useContext } from 'react'
 import { Link } from 'react-scroll'
 import { FiX, FiMenu } from 'react-icons/fi'
-import { FaXTwitter, FaDribbble, FaInstagram } from 'react-icons/fa6'
+import { FaXTwitter, FaFacebookF, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa6'
 import { SectionDataCtx } from '../context/SectionDataContext'
 import './Navbar.css'
 
@@ -84,13 +84,19 @@ export default function Navbar() {
           </ul>
 
           <div className="nav-socials">
-            <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="X">
+            <a href="https://github.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="GitHub">
+              <FaGithub />
+            </a>
+            <a href="https://www.linkedin.com/in/rishusingh1/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+              <FaLinkedin />
+            </a>
+            <a href="https://x.com/imrishurajput1" target="_blank" rel="noreferrer" aria-label="X">
               <FaXTwitter />
             </a>
-            <a href="https://dribbble.com" target="_blank" rel="noreferrer" aria-label="Dribbble">
-              <FaDribbble />
+            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
+              <FaFacebookF />
             </a>
-            <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram">
+            <a href="https://instagram.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="Instagram">
               <FaInstagram />
             </a>
           </div>

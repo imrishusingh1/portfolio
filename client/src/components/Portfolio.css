@@ -82,3 +82,60 @@
   .portfolio-grid { grid-template-columns: 1fr; gap: 48px; } 
   .project-image-box { height: 260px; }
 }
+
+/* Skills Section */
+.portfolio-skills {
+  margin-bottom: 60px;
+}
+.skills-title {
+  font-family: var(--font-head);
+  font-size: 32px;
+  font-weight: 800;
+  color: var(--text-dark);
+  margin-bottom: 16px;
+}
+.skills-desc {
+  font-size: 16px;
+  color: #555;
+  line-height: 1.6;
+  max-width: 800px;
+  margin-bottom: 48px;
+}
+.skills-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.skill-card {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+  font-weight: 600;
+  color: var(--text-dark);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.skill-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.06);
+}
+.skill-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+.skill-icon-placeholder {
+  width: 24px;
+  height: 24px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  color: #555;
+}

@@ -9,6 +9,7 @@ import authRoutes from './routes/auth.js'
 import sectionRoutes from './routes/sections.js'
 import uploadRoutes from './routes/upload.js'
 import paymentRoutes from './routes/payment.js'
+import reviewRoutes from './routes/reviews.js'
 import Section from './models/Section.js'
 import nodemailer from 'nodemailer'
 
@@ -19,7 +20,13 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 app.use(cors({
-  origin: ['https://rishusingh.me', 'http://localhost:5173'],
+  origin: [
+    'https://rishusingh.me',
+    'https://www.rishusingh.me',
+    'https://rishurajput.com',
+    'https://www.rishurajput.com',
+    'http://localhost:5173'
+  ],
   credentials: true
 }))
 app.use(express.json({ limit: '10mb' }))
@@ -30,6 +37,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/sections', sectionRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/payment', paymentRoutes)
+app.use('/api/reviews', reviewRoutes)
 
 // ── Contact messages ──
 const messageSchema = new mongoose.Schema({
@@ -111,6 +119,7 @@ const defaultSections = {
     title: 'More about me',
     bio: "I'm Rishu Singh, a product designer based in London.\nI'm very passionate about the work that I do every day.",
     bioExtended: "My journey in this dynamic and ever-evolving field has been a testament to my passion for crafting meaningful user experiences, leveraging technologies, and fearlessly pushing the boundaries of digital creativity.",
+    experiencesDescription: "I have had the pleasure to work with companies across a variety of industries. I'm always interested in new, exciting and challenging adventures.",
     experiences: [
       { period: 'NOV 2017 – PRESENT', role: 'Creative Director at Malory House', desc: 'Led a talented team in crafting compelling brand experiences.', dot: '#f5a0d0' },
       { period: 'SEP 2015 – APR 2017', role: 'Senior Developer at Longwave Studio', desc: 'Collaborated with cross-functional teams to optimize performance.', dot: '#a0d0a0' },
@@ -118,6 +127,29 @@ const defaultSections = {
     ],
   },
   portfolio: {
+    skillsTitle: 'Technologies and Tools',
+    skillsDescription: 'Using a combination of cutting-edge technologies and reliable open-source software I build user-focused, performant apps and websites for smartphones, tablets, and desktops.',
+    skills: [
+      { name: 'C Language', iconImage: '' },
+      { name: 'C++', iconImage: '' },
+      { name: 'Java', iconImage: '' },
+      { name: 'Python', iconImage: '' },
+      { name: 'TypeScript', iconImage: '' },
+      { name: 'Express', iconImage: '' },
+      { name: 'NodeJS', iconImage: '' },
+      { name: 'Postman', iconImage: '' },
+      { name: 'Docker', iconImage: '' },
+      { name: 'HTML', iconImage: '' },
+      { name: 'CSS', iconImage: '' },
+      { name: 'Redux', iconImage: '' },
+      { name: 'Javascript', iconImage: '' },
+      { name: 'Tailwind CSS', iconImage: '' },
+      { name: 'React', iconImage: '' },
+      { name: 'MySQL', iconImage: '' },
+      { name: 'Mongo DB', iconImage: '' },
+      { name: 'Git', iconImage: '' },
+      { name: 'Firebase', iconImage: '' },
+    ],
     items: [
       { title: 'TempMail Pro', description: 'A temporary email service built for privacy.', color: '#e3e3ff', emoji: '📧', image: '' },
       { title: 'DevConnect Social Network', description: 'A platform connecting developers globally.', color: '#d4f5c4', emoji: '🌐', image: '' },
@@ -129,12 +161,12 @@ const defaultSections = {
   },
   certifications: {
     items: [
-      { title: 'Full Stack Web Development', issuer: 'Udemy', date: '2024', badge: '🎓', bg: '#f0ffdb' },
-      { title: 'AWS Cloud Practitioner', issuer: 'Amazon Web Services', date: '2024', badge: '☁️', bg: '#ffe3f5' },
-      { title: 'React – The Complete Guide', issuer: 'Coursera', date: '2023', badge: '⚛️', bg: '#ffebe3' },
-      { title: 'Data Structures & Algorithms', issuer: 'GeeksforGeeks', date: '2023', badge: '🧮', bg: '#e0f0ff' },
-      { title: 'MongoDB for Developers', issuer: 'MongoDB University', date: '2023', badge: '🍃', bg: '#f0ffdb' },
-      { title: 'System Design Fundamentals', issuer: 'Educative', date: '2022', badge: '🏗️', bg: '#ffe3f5' },
+      { title: 'Full Stack Web Development', issuer: 'Udemy', date: '2024', badge: '🎓', bg: '#f0ffdb', url: '' },
+      { title: 'AWS Cloud Practitioner', issuer: 'Amazon Web Services', date: '2024', badge: '☁️', bg: '#ffe3f5', url: '' },
+      { title: 'React – The Complete Guide', issuer: 'Coursera', date: '2023', badge: '⚛️', bg: '#ffebe3', url: '' },
+      { title: 'Data Structures & Algorithms', issuer: 'GeeksforGeeks', date: '2023', badge: '🧮', bg: '#e0f0ff', url: '' },
+      { title: 'MongoDB for Developers', issuer: 'MongoDB University', date: '2023', badge: '🍃', bg: '#f0ffdb', url: '' },
+      { title: 'System Design Fundamentals', issuer: 'Educative', date: '2022', badge: '🏗️', bg: '#ffe3f5', url: '' },
     ],
   },
   achievements: {

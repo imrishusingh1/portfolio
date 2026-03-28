@@ -25,6 +25,7 @@ export default function AdminDashboard() {
   const navigate = useNavigate()
   const [sections, setSections] = useState([])
   const [messages, setMessages] = useState([])
+  const [adminReviews, setAdminReviews] = useState([])
   const [activeTab, setActiveTab] = useState('hero')
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
@@ -50,6 +51,37 @@ export default function AdminDashboard() {
   async function fetchMessages() {
     const res = await fetch(`${API}/api/messages`)
     if (res.ok) setMessages(await res.json())
+  }
+
+  async function fetchAdminReviews() {
+    const res = await fetch(`${API}/api/reviews/admin/all`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.ok) setAdminReviews(await res.json())
+  }
+
+  async function deleteReview(id) {
+    if (!confirm('Are you sure you want to delete this review?')) return;
+    const res = await fetch(`${API}/api/reviews/admin/${id}`, {
+      method: 'DELETE',
+      headers: { Authorization: `Bearer ${token}` }
+    });
+    if (res.ok) {
+      showToast('Review deleted');
+      fetchAdminReviews();
+    }
+  }
+
+  async function updateReview(id, updates) {
+    const res = await fetch(`${API}/api/reviews/admin/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify(updates)
+    });
+    if (res.ok) {
+      showToast('Review updated');
+      fetchAdminReviews();
+    }
   }
 
   function showToast(msg) {
@@ -151,6 +183,12 @@ export default function AdminDashboard() {
             📬 Messages
           </button>
           <button
+            className={`admin-nav-btn ${activeTab === 'reviews' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('reviews'); fetchAdminReviews() }}
+          >
+            ⭐ Reviews
+          </button>
+          <button
             className={`admin-nav-btn ${activeTab === 'resume' ? 'active' : ''}`}
             onClick={() => setActiveTab('resume')}
           >
@@ -173,7 +211,7 @@ export default function AdminDashboard() {
         {toast && <div className="admin-toast">{toast}</div>}
 
         {/* Section editor */}
-        {activeTab !== 'messages' && activeTab !== 'resume' && activeTab !== 'profile' && currentSection && (
+        {activeTab !== 'messages' && activeTab !== 'resume' && activeTab !== 'profile' && activeTab !== 'reviews' && currentSection && (
           <SectionEditor
             section={currentSection}
             onSave={saveSection}
@@ -194,6 +232,36 @@ export default function AdminDashboard() {
                   <span className="msg-date">{new Date(m.createdAt).toLocaleDateString()}</span>
                 </div>
                 <p className="msg-body">{m.message}</p>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Reviews */}
+        {activeTab === 'reviews' && (
+          <div className="admin-panel">
+            <h2>⭐ Reviews Management</h2>
+            {adminReviews.length === 0 && <p className="admin-empty">No reviews found.</p>}
+            {adminReviews.map(r => (
+              <div key={r._id} className="msg-card" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+                <div className="msg-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                  <div>
+                    <strong>{r.name}</strong> <span style={{color:'#666', fontSize:'13px'}}>({r.role})</span>
+                    <div>
+                      <span style={{color:'#f59e0b'}}>{'★'.repeat(r.stars)}</span>
+                      <span style={{color:'#ccc'}}>{'★'.repeat(5 - r.stars)}</span>
+                    </div>
+                    <div className="msg-date">{new Date(r.createdAt).toLocaleString()}</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '8px' }}>
+                    <button onClick={() => {
+                        const newText = prompt('Edit review text:', r.text);
+                        if (newText !== null && newText !== r.text) updateReview(r._id, { text: newText });
+                    }} className="admin-save-btn" style={{ padding: '6px 12px', fontSize: '12px' }}>✏️ Edit</button>
+                    <button onClick={() => deleteReview(r._id)} className="admin-save-btn" style={{ padding: '6px 12px', fontSize: '12px', background: '#dc2626' }}>🗑️ Delete</button>
+                  </div>
+                </div>
+                <p className="msg-body" style={{ marginTop: '4px', fontStyle: 'italic', background: '#f9fafb', padding: '12px', borderRadius: '6px' }}>"{r.text}"</p>
               </div>
             ))}
           </div>

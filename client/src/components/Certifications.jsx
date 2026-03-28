@@ -4,12 +4,12 @@ import { useSectionData } from '../context/SectionDataContext'
 import './Certifications.css'
 
 const fallback = [
-  { title: 'Full Stack Web Development', issuer: 'Udemy', date: '2024', badge: '🎓', bg: '#f0ffdb' },
-  { title: 'AWS Cloud Practitioner', issuer: 'Amazon Web Services', date: '2024', badge: '☁️', bg: '#ffe3f5' },
-  { title: 'React – The Complete Guide', issuer: 'Coursera', date: '2023', badge: '⚛️', bg: '#ffebe3' },
-  { title: 'Data Structures & Algorithms', issuer: 'GeeksforGeeks', date: '2023', badge: '🧮', bg: '#e0f0ff' },
-  { title: 'MongoDB for Developers', issuer: 'MongoDB University', date: '2023', badge: '🍃', bg: '#f0ffdb' },
-  { title: 'System Design Fundamentals', issuer: 'Educative', date: '2022', badge: '🏗️', bg: '#ffe3f5' },
+  { title: 'Full Stack Web Development', issuer: 'Udemy', date: '2024', badge: '🎓', bg: '#f0ffdb', url: '' },
+  { title: 'AWS Cloud Practitioner', issuer: 'Amazon Web Services', date: '2024', badge: '☁️', bg: '#ffe3f5', url: '' },
+  { title: 'React – The Complete Guide', issuer: 'Coursera', date: '2023', badge: '⚛️', bg: '#ffebe3', url: '' },
+  { title: 'Data Structures & Algorithms', issuer: 'GeeksforGeeks', date: '2023', badge: '🧮', bg: '#e0f0ff', url: '' },
+  { title: 'MongoDB for Developers', issuer: 'MongoDB University', date: '2023', badge: '🍃', bg: '#f0ffdb', url: '' },
+  { title: 'System Design Fundamentals', issuer: 'Educative', date: '2022', badge: '🏗️', bg: '#ffe3f5', url: '' },
 ]
 
 export default function Certifications() {
@@ -30,23 +30,47 @@ export default function Certifications() {
           </div>
 
           <div className="certs-grid">
-            {certifications.map(({ title, issuer, date, badge, bg }, i) => (
-              <motion.div
-                key={title + i}
-                className="cert-card"
-                style={{ borderTop: `6px solid ${bg}` }}
-                initial={{ opacity: 0, y: 28 }}
-                animate={inView ? { opacity: 1, y: 0 } : {}}
-                transition={{ delay: i * 0.08, duration: 0.5 }}
-              >
-                <div className="cert-card-top">
-                  <span className="cert-badge">{badge}</span>
-                  <span className="cert-date">{date}</span>
-                </div>
-                <h3 className="cert-title">{title}</h3>
-                <p className="cert-issuer">{issuer}</p>
-              </motion.div>
-            ))}
+            {certifications.map(({ title, issuer, date, badge, bg, url }, i) => {
+              const content = (
+                <>
+                  <div className="cert-card-top">
+                    <span className="cert-badge">{badge}</span>
+                    <span className="cert-date">{date}</span>
+                  </div>
+                  <h3 className="cert-title">{title}</h3>
+                  <p className="cert-issuer">{issuer}</p>
+                </>
+              )
+
+              if (url) {
+                return (
+                  <motion.a
+                    href={url} target="_blank" rel="noreferrer"
+                    key={title + i}
+                    className="cert-card"
+                    style={{ borderTop: `6px solid ${bg}`, textDecoration: 'none', color: 'inherit', display: 'block' }}
+                    initial={{ opacity: 0, y: 28 }}
+                    animate={inView ? { opacity: 1, y: 0 } : {}}
+                    transition={{ delay: i * 0.08, duration: 0.5 }}
+                  >
+                    {content}
+                  </motion.a>
+                )
+              }
+
+              return (
+                <motion.div
+                  key={title + i}
+                  className="cert-card"
+                  style={{ borderTop: `6px solid ${bg}` }}
+                  initial={{ opacity: 0, y: 28 }}
+                  animate={inView ? { opacity: 1, y: 0 } : {}}
+                  transition={{ delay: i * 0.08, duration: 0.5 }}
+                >
+                  {content}
+                </motion.div>
+              )
+            })}
           </div>
         </div>
       </div>

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import axios from 'axios'
-import { FaXTwitter, FaDribbble, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa6'
+import { FaXTwitter, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa6'
 import { useSectionData } from '../context/SectionDataContext'
 import './Contact.css'
 
@@ -11,7 +11,7 @@ export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
   const [status, setStatus] = useState(null)
   const [animStage, setAnimStage] = useState('idle')
-  
+
   const { data } = useSectionData('contact')
   const emailObj = data?.email || 'hello@rishu.com'
   const text = data?.text || "Have a project in mind? I'd love to hear about it.\nDrop me a message and I'll get back within 24 hours."
@@ -31,16 +31,16 @@ export default function Contact() {
         setAnimStage('done')
         setForm({ name: '', email: '', message: '' })
       }, 4200)
-    } catch { 
-      setStatus('error') 
+    } catch {
+      setStatus('error')
     }
   }
 
   return (
     <section className="section contact-section" id="contact" ref={ref}>
       <svg className="cloud-deco" width="100" height="60" viewBox="0 0 100 60" fill="none">
-        <path d="M10 40 Q20 20 30 40 Q40 60 50 40 Q60 20 70 40 Q80 60 90 40" stroke="#1d1d1d" strokeWidth="2" fill="none" opacity="0.2" strokeLinecap="round"/>
-        <path d="M10 50 Q20 30 30 50 Q40 70 50 50 Q60 30 70 50" stroke="#1d1d1d" strokeWidth="2" fill="none" opacity="0.12" strokeLinecap="round"/>
+        <path d="M10 40 Q20 20 30 40 Q40 60 50 40 Q60 20 70 40 Q80 60 90 40" stroke="#1d1d1d" strokeWidth="2" fill="none" opacity="0.2" strokeLinecap="round" />
+        <path d="M10 50 Q20 30 30 50 Q40 70 50 50 Q60 30 70 50" stroke="#1d1d1d" strokeWidth="2" fill="none" opacity="0.12" strokeLinecap="round" />
       </svg>
 
       <div className="container">
@@ -61,11 +61,10 @@ export default function Contact() {
               {text.split('\n').map((line, i) => <span key={i}>{line}{i < text.split('\n').length - 1 && <br />}</span>)}
             </p>
             <div className="contact-socials">
-              <a href="https://github.com" target="_blank" rel="noreferrer" aria-label="GitHub"><FaGithub /></a>
-              <a href="https://linkedin.com" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
-              <a href="https://twitter.com" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
-              <a href="https://dribbble.com" target="_blank" rel="noreferrer" aria-label="Dribbble"><FaDribbble /></a>
-              <a href="https://instagram.com" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
+              <a href="https://github.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="GitHub"><FaGithub /></a>
+              <a href="https://www.linkedin.com/in/imrishusingh1/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
+              <a href="https://x.com/imrishurajput1" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
+              <a href="https://instagram.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
             </div>
           </div>
 
@@ -90,9 +89,9 @@ export default function Contact() {
 
             {status === 'animating' && animStage !== 'done' && (
               <div className="anim-scene" style={{ position: 'absolute', inset: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                
+
                 {/* Floating Note */}
-                <motion.div 
+                <motion.div
                   initial={{ y: -60, opacity: 0, scale: 0.8 }}
                   animate={animStage === 'folding' ? { y: 20, opacity: 0, scale: 0.2 } : { opacity: 0 }}
                   transition={{ duration: 0.8, delay: 0.2 }}
@@ -107,8 +106,8 @@ export default function Contact() {
                   initial={{ y: 200, opacity: 0 }}
                   animate={
                     animStage === 'folding' || animStage === 'closing' ? { y: 20, opacity: 1 } :
-                    animStage === 'eagle' ? { y: 20, opacity: 1 } :
-                    animStage === 'away' ? { y: -260, x: -420, opacity: 1 } : {}
+                      animStage === 'eagle' ? { y: 20, opacity: 1 } :
+                        animStage === 'away' ? { y: -260, x: -420, opacity: 1 } : {}
                   }
                   transition={{ duration: 0.8 }}
                   style={{ position: 'absolute', zIndex: 10 }}
@@ -120,10 +119,10 @@ export default function Contact() {
                       <polygon points="120,0 60,40 120,80" fill="#fcfaf8" stroke="#111" strokeWidth="2" />
                       <polygon points="0,80 60,40 120,80" fill="#f7f3ee" stroke="#111" strokeWidth="2" />
                     </svg>
-                    
-                    <motion.div 
-                      style={{ 
-                        position: 'absolute', top: 0, left: 0, right: 0, height: '40px', 
+
+                    <motion.div
+                      style={{
+                        position: 'absolute', top: 0, left: 0, right: 0, height: '40px',
                         transformOrigin: 'top', zIndex: 5
                       }}
                       initial={{ rotateX: 180 }}
@@ -142,8 +141,8 @@ export default function Contact() {
                   initial={{ x: 400, y: -200 }}
                   animate={
                     animStage === 'eagle' ? { x: 20, y: -30 } :
-                    animStage === 'away' ? { x: -400, y: -310 } : 
-                    { x: 400, y: -200 }
+                      animStage === 'away' ? { x: -400, y: -310 } :
+                        { x: 400, y: -200 }
                   }
                   transition={{ duration: 0.8 }}
                   style={{ position: 'absolute', zIndex: 20, fontSize: '80px' }}
@@ -157,13 +156,13 @@ export default function Contact() {
             {animStage === 'done' && (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', height: '100%', textAlign: 'center' }}>
                 <motion.svg width="64" height="64" viewBox="0 0 52 52" style={{ marginBottom: '16px' }}>
-                  <motion.circle 
+                  <motion.circle
                     cx="26" cy="26" r="25" fill="#22c55e"
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: "spring", stiffness: 200, damping: 15 }}
                   />
-                  <motion.path 
+                  <motion.path
                     d="M16 26l7 7 15-15" fill="none" stroke="#fff" strokeWidth="4" strokeLinecap="round" strokeLinejoin="round"
                     initial={{ pathLength: 0 }}
                     animate={{ pathLength: 1 }}
@@ -172,9 +171,9 @@ export default function Contact() {
                 </motion.svg>
                 <h3 style={{ fontSize: '24px', fontFamily: 'var(--font-head)', marginBottom: '8px' }}>Dispatched!</h3>
                 <p style={{ color: '#555', fontSize: '15px' }}>Your message is flying its way to me via Eagle.</p>
-                <button 
-                  onClick={() => { setStatus(null); setAnimStage('idle'); }} 
-                  className="contact-submit-btn" 
+                <button
+                  onClick={() => { setStatus(null); setAnimStage('idle'); }}
+                  className="contact-submit-btn"
                   style={{ marginTop: '24px', width: 'auto', padding: '12px 32px' }}
                 >
                   Send Another
