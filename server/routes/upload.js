@@ -1,163 +1,108 @@
 import { Router } from 'express'
 import multer from 'multer'
-import path from 'path'
-import fs from 'fs'
+import { v2 as cloudinary } from 'cloudinary'
+import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import auth from '../middleware/auth.js'
+import Setting from '../models/Setting.js'
 
 const router = Router()
 
-// Ensure uploads directory exists
-const uploadsDir = path.join(process.cwd(), 'uploads')
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true })
-
-// Configure multer for resume uploads
-const storage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadsDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname)
-    cb(null, `resume${ext}`)
-  },
+// ── Configure Cloudinary ─────────────────────────────────────────
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key:    process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-const upload = multer({
-  storage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype === 'application/pdf') {
-      cb(null, true)
-    } else {
-      cb(new Error('Only PDF files are allowed'))
-    }
-  },
+// ── Cloudinary Storages ──────────────────────────────────────────
+const profileStorage = new CloudinaryStorage({
+  cloudinary,
+  params: { folder: 'portfolio', public_id: 'profile', overwrite: true, resource_type: 'image' },
 })
 
-// Upload resume (auth required)
-router.post('/resume', auth, upload.single('resume'), (req, res) => {
+const logoStorage = new CloudinaryStorage({
+  cloudinary,
+  params: { folder: 'portfolio', public_id: 'logo', overwrite: true, resource_type: 'image' },
+})
+
+const resumeStorage = new CloudinaryStorage({
+  cloudinary,
+  params: { folder: 'portfolio', public_id: 'resume', overwrite: true, resource_type: 'raw', format: 'pdf' },
+})
+
+const imageStorage = new CloudinaryStorage({
+  cloudinary,
+  params: (req, file) => ({
+    folder: 'portfolio/images',
+    resource_type: 'image',
+    public_id: `img-${Date.now()}`,
+  }),
+})
+
+const uploadProfile = multer({ storage: profileStorage, limits: { fileSize: 10 * 1024 * 1024 } })
+const uploadLogo    = multer({ storage: logoStorage,    limits: { fileSize: 10 * 1024 * 1024 } })
+const uploadResume  = multer({ storage: resumeStorage,  limits: { fileSize: 10 * 1024 * 1024 } })
+const uploadImage   = multer({ storage: imageStorage,   limits: { fileSize: 10 * 1024 * 1024 } })
+
+// ── Profile Picture ──────────────────────────────────────────────
+router.post('/profile', auth, uploadProfile.single('image'), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  res.json({ success: true, path: `/uploads/${req.file.filename}` })
+  const url = req.file.path
+  await Setting.findOneAndUpdate({ key: 'profile_pic_url' }, { value: url }, { upsert: true, new: true })
+  res.json({ success: true, path: url })
 })
 
-// Check if resume exists
-router.get('/resume/status', (_req, res) => {
-  const resumePath = path.join(uploadsDir, 'resume.pdf')
-  res.json({ exists: fs.existsSync(resumePath) })
-})
-
-// Download resume
-router.get('/download-resume', (req, res) => {
-  const resumePath = path.join(uploadsDir, 'resume.pdf')
-  if (fs.existsSync(resumePath)) {
-    res.download(resumePath, 'resume.pdf')
-  } else {
-    res.status(404).send('Resume not found')
-  }
-})
-
-// Configure multer for profile pictures
-const storageProfile = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadsDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname)
-    cb(null, `profile${ext}`)
-  },
-})
-
-const uploadProfile = multer({
-  storage: storageProfile,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true)
-    else cb(new Error('Only image files are allowed'))
-  },
-})
-
-// Upload profile picture (auth required)
-router.post('/profile', auth, uploadProfile.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  // Remove old profile pics with different extensions to avoid duplicates
-  const files = fs.readdirSync(uploadsDir)
-  files.forEach(f => {
-    if (f.startsWith('profile.') && f !== req.file.filename) {
-      fs.unlinkSync(path.join(uploadsDir, f))
-    }
-  })
-  res.json({ success: true, path: `/uploads/${req.file.filename}` })
-})
-
-// Configure multer for site logo
-const storageLogo = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadsDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname)
-    cb(null, `logo${ext}`)
-  },
-})
-
-const uploadLogo = multer({
-  storage: storageLogo,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true)
-    else cb(new Error('Only image files are allowed'))
-  },
-})
-
-// Upload site logo (auth required)
-router.post('/logo', auth, uploadLogo.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  const files = fs.readdirSync(uploadsDir)
-  files.forEach(f => {
-    if (f.startsWith('logo.') && f !== req.file.filename) {
-      fs.unlinkSync(path.join(uploadsDir, f))
-    }
-  })
-  res.json({ success: true, path: `/uploads/${req.file.filename}` })
-})
-
-// Get current site logo
-router.get('/logo-pic', (req, res) => {
-  const files = fs.readdirSync(uploadsDir)
-  const logoFile = files.find(f => f.startsWith('logo.'))
-  if (logoFile) {
-    res.sendFile(path.join(uploadsDir, logoFile))
-  } else {
+router.get('/profile-pic', async (req, res) => {
+  try {
+    const s = await Setting.findOne({ key: 'profile_pic_url' })
+    if (s?.value) return res.redirect(s.value)
     res.status(404).send('Not found')
-  }
+  } catch { res.status(404).send('Not found') }
 })
 
-// Configure multer for generic images (thumbnails, etc.)
-const storageImage = multer.diskStorage({
-  destination: (_req, _file, cb) => cb(null, uploadsDir),
-  filename: (_req, file, cb) => {
-    const ext = path.extname(file.originalname)
-    cb(null, `img-${Date.now()}${ext}`)
-  },
+// ── Site Logo ────────────────────────────────────────────────────
+router.post('/logo', auth, uploadLogo.single('image'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
+  const url = req.file.path
+  await Setting.findOneAndUpdate({ key: 'logo_url' }, { value: url }, { upsert: true, new: true })
+  res.json({ success: true, path: url })
 })
 
-const uploadImage = multer({
-  storage: storageImage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
-  fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) cb(null, true)
-    else cb(new Error('Only image files are allowed'))
-  },
+router.get('/logo-pic', async (req, res) => {
+  try {
+    const s = await Setting.findOne({ key: 'logo_url' })
+    if (s?.value) return res.redirect(s.value)
+    res.status(404).send('Not found')
+  } catch { res.status(404).send('Not found') }
 })
 
-// Generic image upload (auth required)
+// ── Resume (PDF) ─────────────────────────────────────────────────
+router.post('/resume', auth, uploadResume.single('resume'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
+  const url = req.file.path
+  await Setting.findOneAndUpdate({ key: 'resume_url' }, { value: url }, { upsert: true, new: true })
+  res.json({ success: true, path: url })
+})
+
+router.get('/resume/status', async (req, res) => {
+  try {
+    const s = await Setting.findOne({ key: 'resume_url' })
+    res.json({ exists: !!s?.value })
+  } catch { res.json({ exists: false }) }
+})
+
+router.get('/download-resume', async (req, res) => {
+  try {
+    const s = await Setting.findOne({ key: 'resume_url' })
+    if (s?.value) return res.redirect(s.value)
+    res.status(404).send('Resume not found')
+  } catch { res.status(404).send('Resume not found') }
+})
+
+// ── Generic Image ────────────────────────────────────────────────
 router.post('/image', auth, uploadImage.single('image'), (req, res) => {
   if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  res.json({ success: true, path: `/uploads/${req.file.filename}` })
-})
-
-// Get current profile picture
-router.get('/profile-pic', (req, res) => {
-  const files = fs.readdirSync(uploadsDir)
-  const profileFile = files.find(f => f.startsWith('profile.'))
-  if (profileFile) {
-    res.sendFile(path.join(uploadsDir, profileFile))
-  } else {
-    res.status(404).send('Not found')
-  }
+  res.json({ success: true, path: req.file.path })
 })
 
 export default router

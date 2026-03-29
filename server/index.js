@@ -67,7 +67,7 @@ const contactLimiter = rateLimit({
 })
 
 app.use(express.json({ limit: '10mb' }))
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+// /uploads removed — files now served from Cloudinary CDN
 
 // ── API Secret Guard: only our frontend can talk to this server ──
 const apiSecretGuard = (req, res, next) => {
@@ -371,17 +371,24 @@ async function seedSections() {
   }
 }
 
-// ── Connect & Start ──
+// ── Connect to MongoDB ────────────────────────────────────────────
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/portfolio'
+
 mongoose
   .connect(MONGO_URI)
   .then(async () => {
     console.log('✅ MongoDB connected')
     await seedSections()
-    app.listen(PORT, () => console.log(`Server on http://localhost:${PORT}`))
+    // Only start HTTP listener in local dev — Vercel handles HTTP itself
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => console.log(`Server on http://localhost:${PORT}`))
+    }
   })
   .catch((err) => {
     console.log('⚠️  MongoDB not connected:', err.message)
-    // Start server anyway for dev
-    app.listen(PORT, () => console.log(`Server on http://localhost:${PORT} (no DB)`))
+    if (!process.env.VERCEL) {
+      app.listen(PORT, () => console.log(`Server on http://localhost:${PORT} (no DB)`))
+    }
   })
+
+export default app
