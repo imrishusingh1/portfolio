@@ -28,7 +28,7 @@ export default function Footer() {
         <div className="footer-divider" />
         <div className="footer-bottom">
           <span>© {new Date().getFullYear()} Rishu Singh. All rights reserved.</span>
-          <a href="mailto:hello@rishusingh.com" className="footer-email">hello@rishusingh.com</a>
+          <a href="mailto:hello@rishurajput.com" className="footer-email">hello@rishurajput.com</a>
         </div>
       </div>
     </footer>
