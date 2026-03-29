@@ -15,7 +15,7 @@ export default function Hero() {
 
   const SparkleSVG = ({ size = 40, className = '' }) => (
     <svg className={className} width={size} height={size} viewBox="0 0 40 40" fill="none" style={{ flexShrink: 0 }}>
-      <path d="M20 0 Q20 20 40 20 Q20 20 20 40 Q20 20 0 20 Q20 20 20 0Z" fill="currentColor"/>
+      <path d="M20 0 Q20 20 40 20 Q20 20 20 40 Q20 20 0 20 Q20 20 20 0Z" fill="currentColor" />
     </svg>
   )
 
@@ -23,7 +23,7 @@ export default function Hero() {
     <section className="hero" id="home">
       {/* Squiggle bottom right */}
       <svg className="squiggle-deco" width="80" height="60" viewBox="0 0 80 60" fill="none">
-        <path d="M10 50 Q20 10 30 30 Q40 50 50 20 Q60 -10 70 10" stroke="#1d1d1d" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.35"/>
+        <path d="M10 50 Q20 10 30 30 Q40 50 50 20 Q60 -10 70 10" stroke="#1d1d1d" strokeWidth="2.5" strokeLinecap="round" fill="none" opacity="0.35" />
       </svg>
 
       <div className="container hero-inner">
@@ -49,7 +49,7 @@ export default function Hero() {
             <span className="wavy-word">
               {subhead}
               <svg className="wavy-svg" viewBox="0 0 260 20" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                <path d="M 5,6 Q 120,3 235,5 L 90,13 Q 180,15 250,15" stroke="#908aee" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
+                <path d="M 5,6 Q 120,3 235,5 L 90,13 Q 180,15 250,15" stroke="#908aee" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
               </svg>
             </span>
           </h1>
@@ -73,14 +73,14 @@ export default function Hero() {
         >
           <div className="hero-arch-container">
             {/* Rotating badge */}
-            <div 
+            <div
               className="rotating-badge-wrap"
               onMouseEnter={() => setBurstCount(c => c + 1)}
               onMouseLeave={() => setBurstCount(c => c - 1)}
               onClick={() => setBurstCount(c => c + 1)}
             >
               <div className="rotating-badge">
-                <div 
+                <div
                   className="badge-burst"
                   style={{
                     transition: 'transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -95,13 +95,14 @@ export default function Hero() {
                       </defs>
                       <text fontSize="12.5" fontWeight="800" fill="#1d1d1d" fontFamily="Cabinet Grotesk, sans-serif" letterSpacing="1">
                         <textPath href="#circlePath" textLength="301.5" startOffset="0%">
-                          ✦ FOR FREELANCE ✦ I AM AVAILABLE
+                          {/* SCALABLE SYSTEMS • CLEAN ARCHITECTURE • */}
+                          FULL-STACK ENGINEERING • SYSTEMS THINKING •
                         </textPath>
                       </text>
                     </svg>
                   </div>
                 </div>
-                
+
                 <div className="badge-center">
                   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                     <line x1="7" y1="17" x2="17" y2="7"></line>
@@ -113,19 +114,19 @@ export default function Hero() {
 
             {/* Arch photo */}
             <div className="hero-arch">
-              <img 
-                src={`${API}/api/upload/profile-pic`} 
-                onError={(e) => { e.target.src = '/profile.png' }} 
-                alt="Rishu Singh – Product Designer" 
-                className="hero-photo" 
+              <img
+                src={`${API}/api/upload/profile-pic`}
+                onError={(e) => { e.target.src = '/profile.png' }}
+                alt="Rishu Rajput – Rishu Kumar Singh, Full-Stack Developer & System Designer"
+                className="hero-photo"
               />
             </div>
 
             {/* Air / Wind decoration overlapping right edge */}
             <svg className="hero-wind" viewBox="0 0 120 70" fill="none">
-              <path d="M0 20 Q 30 5 60 20 T 120 20" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" fill="none"/>
-              <path d="M20 40 Q 50 25 80 40 T 140 40" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" fill="none"/>
-              <path d="M15 60 Q 45 45 75 60 T 135 60" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" fill="none"/>
+              <path d="M0 20 Q 30 5 60 20 T 120 20" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" fill="none" />
+              <path d="M20 40 Q 50 25 80 40 T 140 40" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" fill="none" />
+              <path d="M15 60 Q 45 45 75 60 T 135 60" stroke="#1d1d1d" strokeWidth="2" strokeLinecap="round" fill="none" />
             </svg>
           </div>
         </motion.div>

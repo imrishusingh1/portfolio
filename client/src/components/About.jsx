@@ -57,7 +57,7 @@ export default function About() {
                   <img
                     src={`${API}/api/upload/profile-pic`}
                     onError={(e) => { e.target.src = '/profile.png' }}
-                    alt="Rishu Singh"
+                    alt="Rishu Rajput – Rishu Kumar Singh, Full-Stack Developer"
                   />
                 </div>
                 {/* Rotating badge */}

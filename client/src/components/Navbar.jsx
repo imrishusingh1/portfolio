@@ -5,14 +5,14 @@ import { FaXTwitter, FaFacebookF, FaInstagram, FaGithub, FaLinkedin } from 'reac
 import { SectionDataCtx } from '../context/SectionDataContext'
 import './Navbar.css'
 
-const navLinks = ['Home', 'Services', 'About', 'Portfolio', 'Achievements', 'Blog', 'Pricing', 'Contact']
+const navLinks = ['Home', 'Services', 'About', 'Portfolio', 'Achievements', 'Education', 'Blog', 'Pricing', 'Contact']
 
 export default function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [open, setOpen] = useState(false)
   const [logoError, setLogoError] = useState(false)
   const { sections } = useContext(SectionDataCtx)
-  const API = import.meta.env.VITE_API_URL || 'https://api.rishusingh.me'
+  const API = import.meta.env.VITE_API_URL || 'https://api.rishurajput.com'
 
   const navbarSettings = sections?.navbar || { useImage: true, logoImage: '', logoText: 'Rishu Singh' }
   const { useImage, logoImage, logoText } = navbarSettings
@@ -23,6 +23,7 @@ export default function Navbar() {
     About: 'experiences', // About and Experience are combined in About.jsx, we check experiences or about
     Portfolio: 'portfolio',
     Achievements: 'achievements',
+    Education: 'education',
     Blog: 'blog',
     Pricing: 'pricing',
     Contact: 'contact'
@@ -87,13 +88,13 @@ export default function Navbar() {
             <a href="https://github.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="GitHub">
               <FaGithub />
             </a>
-            <a href="https://www.linkedin.com/in/rishusingh1/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
+            <a href="https://www.linkedin.com/in/imrishusingh1/" target="_blank" rel="noreferrer" aria-label="LinkedIn">
               <FaLinkedin />
             </a>
             <a href="https://x.com/imrishurajput1" target="_blank" rel="noreferrer" aria-label="X">
               <FaXTwitter />
             </a>
-            <a href="https://facebook.com" target="_blank" rel="noreferrer" aria-label="Facebook">
+            <a href="https://www.facebook.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="Facebook">
               <FaFacebookF />
             </a>
             <a href="https://instagram.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="Instagram">

@@ -25,7 +25,7 @@ export default function Certifications() {
           <div className="certs-header" style={{ textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             <div className="section-tag" style={{ margin: '0 auto 24px' }}>✳ CERTIFICATIONS</div>
             <h2 className="section-title-center">
-              Courses & certifications<br />I've completed.
+              Certifications &<br />Technical Learning
             </h2>
           </div>
 

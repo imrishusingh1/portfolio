@@ -9,6 +9,7 @@ const SECTION_LABELS = {
   about: '👤 About (with Experiences)',
   portfolio: '📁 Portfolio',
   certifications: '🎓 Certifications',
+  education: '📚 Education',
   achievements: '🏆 Achievements',
   opensource: '🐙 Open Source',
   process: '🔄 Process',
@@ -335,12 +336,19 @@ function SectionEditor({ section, onSave, onToggle, saving }) {
       let arr = copy
       for (const k of keys) arr = arr[k]
       if (Array.isArray(arr)) {
-        const template = arr.length > 0 ? { ...arr[0] } : {}
-        Object.keys(template).forEach(k => {
-          if (typeof template[k] === 'string') template[k] = ''
-          if (typeof template[k] === 'number') template[k] = 0
-        })
-        arr.unshift(template)
+        // Primitive array (strings/numbers) → just add one empty value
+        if (arr.length === 0 || typeof arr[0] !== 'object') {
+          arr.unshift(typeof arr[0] === 'number' ? 0 : '')
+        } else {
+          // Object array → clone first item as blank template
+          const template = { ...arr[0] }
+          Object.keys(template).forEach(k => {
+            if (typeof template[k] === 'string') template[k] = ''
+            if (typeof template[k] === 'number') template[k] = 0
+            if (Array.isArray(template[k])) template[k] = []
+          })
+          arr.unshift(template)
+        }
       }
       return copy
     })
@@ -363,7 +371,7 @@ function SectionEditor({ section, onSave, onToggle, saving }) {
     fd.append('image', file)
     try {
       const token = localStorage.getItem('admin_token')
-      const API = import.meta.env.VITE_API_URL || 'https://api.rishusingh.me'
+      const API = import.meta.env.VITE_API_URL || 'https://api.rishurajput.com'
       const res = await fetch(`${API}/api/upload/image`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}` },

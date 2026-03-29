@@ -10,6 +10,7 @@ import About from './components/About'
 import Portfolio from './components/Portfolio'
 import Testimonials from './components/Testimonials'
 import Certifications from './components/Certifications'
+import Education from './components/Education'
 import Achievements from './components/Achievements'
 import OpenSource from './components/OpenSource'
 import Process from './components/Process'
@@ -45,6 +46,7 @@ function PublicSite() {
         <Section sectionKey="process"><Process /></Section>
         <Section sectionKey="blog"><Blog /></Section>
         <Section sectionKey="research"><Research /></Section>
+        <Section sectionKey="education"><Education /></Section>
         <Section sectionKey="pricing"><Pricing /></Section>
         <Section sectionKey="contact"><Contact /></Section>
       </main>

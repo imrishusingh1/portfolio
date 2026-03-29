@@ -21,8 +21,6 @@ const PORT = process.env.PORT || 5000
 
 app.use(cors({
   origin: [
-    'https://rishusingh.me',
-    'https://www.rishusingh.me',
     'https://rishurajput.com',
     'https://www.rishurajput.com',
     'http://localhost:5173'
@@ -151,12 +149,12 @@ const defaultSections = {
       { name: 'Firebase', iconImage: '' },
     ],
     items: [
-      { title: 'TempMail Pro', description: 'A temporary email service built for privacy.', color: '#e3e3ff', emoji: '📧', image: '' },
-      { title: 'DevConnect Social Network', description: 'A platform connecting developers globally.', color: '#d4f5c4', emoji: '🌐', image: '' },
-      { title: 'TaskFlow AI Assistant', description: 'Intelligent task management using AI.', color: '#f5d4e8', emoji: '🤖', image: '' },
-      { title: 'EcomEase Storefront', description: 'High-conversion headless e-commerce.', color: '#d4e8f5', emoji: '🛒', image: '' },
-      { title: 'LeetCode Automation Solver', description: 'Automation script for algorithm solutions.', color: '#fff5d4', emoji: '⚡', image: '' },
-      { title: 'Creative Portfolio Engine', description: 'Open-source React portfolio template.', color: '#f5e3ff', emoji: '🎨', image: '' },
+      { title: 'TempMail Pro', description: 'A temporary email service built for privacy.', color: '#e3e3ff', emoji: '📧', image: '', url: '' },
+      { title: 'DevConnect Social Network', description: 'A platform connecting developers globally.', color: '#d4f5c4', emoji: '🌐', image: '', url: '' },
+      { title: 'TaskFlow AI Assistant', description: 'Intelligent task management using AI.', color: '#f5d4e8', emoji: '🤖', image: '', url: '' },
+      { title: 'EcomEase Storefront', description: 'High-conversion headless e-commerce.', color: '#d4e8f5', emoji: '🛒', image: '', url: '' },
+      { title: 'LeetCode Automation Solver', description: 'Automation script for algorithm solutions.', color: '#fff5d4', emoji: '⚡', image: '', url: '' },
+      { title: 'Creative Portfolio Engine', description: 'Open-source React portfolio template.', color: '#f5e3ff', emoji: '🎨', image: '', url: '' },
     ],
   },
   certifications: {
@@ -167,6 +165,43 @@ const defaultSections = {
       { title: 'Data Structures & Algorithms', issuer: 'GeeksforGeeks', date: '2023', badge: '🧮', bg: '#e0f0ff', url: '' },
       { title: 'MongoDB for Developers', issuer: 'MongoDB University', date: '2023', badge: '🍃', bg: '#f0ffdb', url: '' },
       { title: 'System Design Fundamentals', issuer: 'Educative', date: '2022', badge: '🏗️', bg: '#ffe3f5', url: '' },
+    ],
+  },
+  education: {
+    items: [
+      {
+        institution: 'Lovely Professional University',
+        location: 'Punjab, India',
+        degree: 'Bachelor of Technology — Computer Science & Engineering',
+        score: 'CGPA: 8.22',
+        period: "Aug' 2023 – Present",
+        icon: '🎓',
+        color: '#7c6fcd',
+        dotColor: '#e8c4e8',
+        tag: 'UNDERGRADUATE',
+      },
+      {
+        institution: 'Sachchidanand Sinha College',
+        location: 'Aurangabad, Bihar',
+        degree: 'Intermediate (Class XII)',
+        score: 'Percentage: 72.6%',
+        period: "Apr' 2021 – Mar' 2022",
+        icon: '📖',
+        color: '#3aafa9',
+        dotColor: '#9ecfcc',
+        tag: 'HIGHER SECONDARY',
+      },
+      {
+        institution: 'Saraswati Shishu Mandir',
+        location: 'Aurangabad, Bihar',
+        degree: 'Matriculation (Class X)',
+        score: 'Percentage: 85.4%',
+        period: "Apr' 2019 – Mar' 2020",
+        icon: '🏫',
+        color: '#e07b5f',
+        dotColor: '#c5e0f0',
+        tag: 'SECONDARY',
+      },
     ],
   },
   achievements: {

@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { motion, useInView } from 'framer-motion'
 import axios from 'axios'
-import { FaXTwitter, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa6'
+import { FaXTwitter, FaInstagram, FaGithub, FaLinkedin, FaFacebookF } from 'react-icons/fa6'
 import { useSectionData } from '../context/SectionDataContext'
 import './Contact.css'
 
@@ -21,7 +21,7 @@ export default function Contact() {
     e.preventDefault()
     setStatus('sending')
     try {
-      await axios.post('https://api.rishusingh.me/api/contact', form)
+      await axios.post('https://api.rishurajput.com/api/contact', form)
       setStatus('animating')
       setAnimStage('folding')
       setTimeout(() => setAnimStage('closing'), 1200)
@@ -64,6 +64,7 @@ export default function Contact() {
               <a href="https://github.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="GitHub"><FaGithub /></a>
               <a href="https://www.linkedin.com/in/imrishusingh1/" target="_blank" rel="noreferrer" aria-label="LinkedIn"><FaLinkedin /></a>
               <a href="https://x.com/imrishurajput1" target="_blank" rel="noreferrer" aria-label="X"><FaXTwitter /></a>
+              <a href="https://www.facebook.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebookF /></a>
               <a href="https://instagram.com/imrishusingh1" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
             </div>
           </div>

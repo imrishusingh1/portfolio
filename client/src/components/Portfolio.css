@@ -32,7 +32,8 @@
 }
 
 .project-image-box {
-  height: 380px;
+  aspect-ratio: 16 / 9;
+  height: auto;
   border-radius: 16px;
   border: none;
   display: flex;
@@ -80,7 +81,6 @@
 
 @media (max-width: 768px) { 
   .portfolio-grid { grid-template-columns: 1fr; gap: 48px; } 
-  .project-image-box { height: 260px; }
 }
 
 /* Skills Section */

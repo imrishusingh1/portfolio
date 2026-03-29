@@ -3,6 +3,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion';
 import { FiArrowLeft, FiArrowRight, FiStar } from 'react-icons/fi';
 import { GoogleLogin } from '@react-oauth/google';
 import axios from 'axios';
+import { useAPI } from '../context/SectionDataContext';
 import './Testimonials.css';
 
 const defaultTestimonials = [
@@ -40,7 +41,7 @@ export default function Testimonials() {
   const inView = useInView(ref, { once: true, margin: '-80px' });
 
   // Use the correct API base URL
-  const API_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000';
+  const API_URL = useAPI();
 
   useEffect(() => {
     fetchReviews();

@@ -4,10 +4,6 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
-    host: true, // allow external access (VERY important)
-    allowedHosts: [
-      'rishusingh.me',
-      'www.rishusingh.me'
-    ]
+    host: true, // needed for local network access
   }
 })

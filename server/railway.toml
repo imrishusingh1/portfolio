@@ -1,0 +1,11 @@
+# ── Railway deployment config ──────────────────────────────────────
+# Railway auto-detects Node.js and runs `npm start`
+# Make sure to set these env vars in Railway dashboard:
+
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "node index.js"
+restartPolicyType = "on_failure"
+restartPolicyMaxRetries = 10

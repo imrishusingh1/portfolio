@@ -1,15 +1,15 @@
-import { useRef } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import { motion, useInView } from 'framer-motion'
 import { useSectionData, useAPI } from '../context/SectionDataContext'
 import './Portfolio.css'
 
 const fallbackProjects = [
-  { title: 'TempMail Pro', description: 'A temporary email service built for privacy.', color: '#e3e3ff', emoji: '📧' },
-  { title: 'DevConnect Social Network', description: 'A platform connecting developers globally.', color: '#d4f5c4', emoji: '🌐' },
-  { title: 'TaskFlow AI Assistant', description: 'Intelligent task management using AI.', color: '#f5d4e8', emoji: '🤖' },
-  { title: 'EcomEase Storefront', description: 'High-conversion headless e-commerce.', color: '#d4e8f5', emoji: '🛒' },
-  { title: 'LeetCode Automation Solver', description: 'Automation script for algorithm solutions.', color: '#fff5d4', emoji: '⚡' },
-  { title: 'Creative Portfolio Engine', description: 'Open-source React portfolio template.', color: '#f5e3ff', emoji: '🎨' },
+  { title: 'TempMail Pro', description: 'A temporary email service built for privacy.', color: '#e3e3ff', emoji: '📧', url: '' },
+  { title: 'DevConnect Social Network', description: 'A platform connecting developers globally.', color: '#d4f5c4', emoji: '🌐', url: '' },
+  { title: 'TaskFlow AI Assistant', description: 'Intelligent task management using AI.', color: '#f5d4e8', emoji: '🤖', url: '' },
+  { title: 'EcomEase Storefront', description: 'High-conversion headless e-commerce.', color: '#d4e8f5', emoji: '🛒', url: '' },
+  { title: 'LeetCode Automation Solver', description: 'Automation script for algorithm solutions.', color: '#fff5d4', emoji: '⚡', url: '' },
+  { title: 'Creative Portfolio Engine', description: 'Open-source React portfolio template.', color: '#f5e3ff', emoji: '🎨', url: '' },
 ]
 
 const fallbackSkills = [
@@ -34,6 +34,72 @@ const fallbackSkills = [
   { name: 'Firebase', iconImage: '' },
 ]
 
+const getSkillIconUrl = (name) => {
+  const n = name.toLowerCase().trim();
+  if (n.includes('c++')) return 'cpp';
+  if (n.includes('c#')) return 'cs';
+  if (n === 'c language' || n === 'c') return 'c';
+  if (n.includes('node')) return 'nodejs';
+  if (n.includes('javascript') || n === 'js') return 'js';
+  if (n.includes('typescript') || n === 'ts') return 'ts';
+  if (n.includes('tailwind')) return 'tailwind';
+  if (n.includes('mongo')) return 'mongodb';
+  if (n.includes('react')) return 'react';
+  if (n.includes('py')) return 'python';
+  if (n.includes('html')) return 'html';
+  if (n.includes('css')) return 'css';
+  if (n.includes('docker')) return 'docker';
+  if (n.includes('aws')) return 'aws';
+  if (n.includes('firebase')) return 'firebase';
+  if (n.includes('postgres')) return 'postgres';
+  if (n.includes('mysql')) return 'mysql';
+  if (n.includes('git')) return 'git';
+  if (n === 'java' || n.includes('java ')) return 'java';
+  if (n.includes('spring')) return 'spring';
+  if (n.includes('express')) return 'express';
+  if (n.includes('redux')) return 'redux';
+  if (n.includes('linux')) return 'linux';
+  if (n.includes('php')) return 'php';
+  if (n.includes('ruby')) return 'ruby';
+  if (n.includes('rust')) return 'rust';
+  if (n.includes('angular')) return 'angular';
+  if (n.includes('vue')) return 'vue';
+  if (n.includes('svelte')) return 'svelte';
+  if (n.includes('next')) return 'nextjs';
+  if (n.includes('nuxt')) return 'nuxtjs';
+  if (n.includes('laravel')) return 'laravel';
+  if (n.includes('django')) return 'django';
+  if (n.includes('github')) return 'github';
+  if (n.includes('vercel')) return 'vercel';
+  if (n.includes('figma')) return 'figma';
+  if (n.includes('postman')) return 'postman';
+
+  // Smart fallback: try to guess the slug by removing spaces and specials
+  const guessedSlug = n.replace(/[^a-z0-9]/g, '');
+  return guessedSlug.length > 0 ? guessedSlug : null;
+}
+
+const SkillIcon = ({ name, uploadedIcon, API }) => {
+  const [error, setError] = useState(false);
+
+  // Reset error state if props change
+  useEffect(() => setError(false), [name, uploadedIcon]);
+
+  // 1. If manual upload exists, prioritize it
+  if (uploadedIcon && !error) {
+    return <img src={`${API}${uploadedIcon}`} alt={name} className="skill-icon" onError={() => setError(true)} />;
+  }
+
+  // 2. If no valid manual upload, try finding a web icon
+  const autoSlug = getSkillIconUrl(name);
+  if (autoSlug && !error) {
+    return <img src={`https://skillicons.dev/icons?i=${autoSlug}`} alt={name} className="skill-icon" onError={() => setError(true)} />;
+  }
+
+  // 3. Last fallback: First letter placeholder
+  return <div className="skill-icon-placeholder">{name.charAt(0)}</div>;
+}
+
 export default function Portfolio() {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true, margin: '-80px' })
@@ -57,16 +123,20 @@ export default function Portfolio() {
             </svg>
             <div className="section-tag" style={{ margin: "0 auto 24px" }}>✳ MY WORKS</div>
             <h2 className="section-title-center portfolio-title" style={{ maxWidth: "800px" }}>
-              Check out some of our awesome<br />
-              projects with creative ideas.
+              {/* Check out some of our awesome<br />
+              projects with creative ideas. */}
+              Selected projects showcasing real-world problem solving and system design.
+
             </h2>
           </div>
 
           <div className="portfolio-grid">
-            {projects.map(({ title, description, color, emoji, image }, i) => (
+            {projects.map(({ title, description, color, emoji, image, url }, i) => (
               <motion.a
                 key={title + i}
-                href="#"
+                href={url || "#"}
+                target={url ? "_blank" : "_self"}
+                rel={url ? "noreferrer" : ""}
                 className="project-card"
                 initial={{ opacity: 0, y: 28 }}
                 animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -97,7 +167,7 @@ export default function Portfolio() {
               <h2 className="skills-title">{skillsTitle}</h2>
               <p className="skills-desc">{skillsDescription}</p>
             </motion.div>
-            
+
             <div className="skills-grid">
               {skills.map((skill, i) => (
                 <motion.div
@@ -107,11 +177,7 @@ export default function Portfolio() {
                   animate={inView ? { opacity: 1, y: 0 } : {}}
                   transition={{ delay: i * 0.04, duration: 0.4 }}
                 >
-                  {skill.iconImage ? (
-                    <img src={`${API}${skill.iconImage}`} alt={skill.name} className="skill-icon" />
-                  ) : (
-                    <div className="skill-icon-placeholder">{skill.name.charAt(0)}</div>
-                  )}
+                  <SkillIcon name={skill.name} uploadedIcon={skill.iconImage} API={API} />
                   <span className="skill-name">{skill.name}</span>
                 </motion.div>
               ))}
