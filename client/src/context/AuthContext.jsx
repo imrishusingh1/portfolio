@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 const AuthCtx = createContext(null)
 
-const API = import.meta.env.VITE_API_URL || 'https://api.rishurajput.com'
+const API = import.meta.env.VITE_API_URL || ''
 
 export function AuthProvider({ children }) {
   const [token, setToken] = useState(localStorage.getItem('admin_token'))

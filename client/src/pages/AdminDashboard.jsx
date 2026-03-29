@@ -371,7 +371,7 @@ function SectionEditor({ section, onSave, onToggle, saving }) {
     fd.append('image', file)
     try {
       const token = localStorage.getItem('admin_token')
-      const API = import.meta.env.VITE_API_URL || 'https://api.rishurajput.com'
+      const API = import.meta.env.VITE_API_URL || ''
       const res = await fetch(`${API}/api/upload/image`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'x-api-secret': import.meta.env.VITE_API_SECRET || '' },

@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react'
 
 export const SectionDataCtx = createContext({})
 
-const API = import.meta.env.VITE_API_URL || 'https://api.rishurajput.com'
+const API = import.meta.env.VITE_API_URL || ''
 
 export function SectionDataProvider({ children }) {
   const [sections, setSections] = useState(null)

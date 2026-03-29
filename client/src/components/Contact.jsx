@@ -21,7 +21,8 @@ export default function Contact() {
     e.preventDefault()
     setStatus('sending')
     try {
-      await axios.post('https://api.rishurajput.com/api/contact', form)
+      const API = import.meta.env.VITE_API_URL || ''
+      await axios.post(`${API}/api/contact`, form)
       setStatus('animating')
       setAnimStage('folding')
       setTimeout(() => setAnimStage('closing'), 1200)
