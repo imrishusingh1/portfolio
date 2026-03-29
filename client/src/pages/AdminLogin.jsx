@@ -31,7 +31,7 @@ export default function AdminLogin() {
     try {
       const res = await fetch(`${API}${endpoint}`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'x-api-secret': import.meta.env.VITE_API_SECRET || '' },
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json()
