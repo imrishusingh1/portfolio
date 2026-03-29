@@ -4,6 +4,9 @@ import cors from 'cors'
 import dotenv from 'dotenv'
 import path from 'path'
 import { fileURLToPath } from 'url'
+import helmet from 'helmet'
+import rateLimit from 'express-rate-limit'
+import slowDown from 'express-slow-down'
 
 import authRoutes from './routes/auth.js'
 import sectionRoutes from './routes/sections.js'
@@ -27,11 +30,57 @@ app.use(cors({
   ],
   credentials: true
 }))
+
+// ── Security headers (hides server info, stops clickjacking etc.) ──
+app.use(helmet())
+
+// ── Global rate limit: 120 requests / 1 minute per IP ──
+const globalLimiter = rateLimit({
+  windowMs: 60 * 1000,        // 1 minute
+  max: 120,                   // max 120 requests per IP
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please slow down.' },
+})
+app.use(globalLimiter)
+
+// ── Slow down repeated requests (progressive delay) ──
+const speedLimiter = slowDown({
+  windowMs: 60 * 1000,        // 1 minute window
+  delayAfter: 40,             // start slowing after 40 requests
+  delayMs: (hits) => hits * 100, // add 100ms per extra request
+})
+app.use(speedLimiter)
+
+// ── Strict limiter for auth routes (5 attempts / 15 min) ──
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,   // 15 minutes
+  max: 5,
+  message: { error: 'Too many login attempts. Try again in 15 minutes.' },
+})
+
+// ── Contact form limit (3 per hour) ──
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,   // 1 hour
+  max: 3,
+  message: { error: 'Too many messages sent. Please wait before sending again.' },
+})
+
 app.use(express.json({ limit: '10mb' }))
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
+// ── API Secret Guard: only our frontend can talk to this server ──
+const apiSecretGuard = (req, res, next) => {
+  // Allow CORS preflight
+  if (req.method === 'OPTIONS') return next()
+  const secret = req.headers['x-api-secret']
+  if (!process.env.API_SECRET || secret === process.env.API_SECRET) return next()
+  return res.status(403).json({ error: 'Forbidden: invalid API secret.' })
+}
+app.use(apiSecretGuard)
+
 // ── Routes ──
-app.use('/api/auth', authRoutes)
+app.use('/api/auth', authLimiter, authRoutes)   // max 5 login attempts / 15 min
 app.use('/api/sections', sectionRoutes)
 app.use('/api/upload', uploadRoutes)
 app.use('/api/payment', paymentRoutes)
@@ -46,7 +95,7 @@ const messageSchema = new mongoose.Schema({
 })
 const Message = mongoose.model('Message', messageSchema)
 
-app.post('/api/contact', async (req, res) => {
+app.post('/api/contact', contactLimiter, async (req, res) => {
   const { name, email, message } = req.body
   if (!name || !email || !message) return res.status(400).json({ error: 'All fields are required.' })
   try {

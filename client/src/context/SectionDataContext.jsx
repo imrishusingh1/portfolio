@@ -8,7 +8,9 @@ export function SectionDataProvider({ children }) {
   const [sections, setSections] = useState(null)
 
   useEffect(() => {
-    fetch(`${API}/api/sections`)
+    fetch(`${API}/api/sections`, {
+      headers: { 'x-api-secret': import.meta.env.VITE_API_SECRET || '' }
+    })
       .then(r => r.ok ? r.json() : {})
       .then(data => setSections(data))
       .catch(() => setSections({}))

@@ -374,7 +374,7 @@ function SectionEditor({ section, onSave, onToggle, saving }) {
       const API = import.meta.env.VITE_API_URL || 'https://api.rishurajput.com'
       const res = await fetch(`${API}/api/upload/image`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${token}`, 'x-api-secret': import.meta.env.VITE_API_SECRET || '' },
         body: fd,
       })
       if (res.ok) {
