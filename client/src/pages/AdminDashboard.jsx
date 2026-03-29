@@ -295,7 +295,7 @@ export default function AdminDashboard() {
             <div style={{ marginTop: 24 }}>
               <img 
                 src={`${API}/api/upload/profile-pic?t=${new Date().getTime()}`} 
-                onError={(e) => { e.target.src = '/profile.png'; e.target.style.opacity = 0.5 }} 
+                onError={(e) => { e.target.src = '/rishusingh.jpg'; e.target.style.opacity = 0.5 }} 
                 alt="Current Profile" 
                 style={{ width: 140, height: 140, objectFit: 'cover', borderRadius: '50%', border: '2px solid #1d1d1d' }} 
               />

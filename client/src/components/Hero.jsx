@@ -116,7 +116,7 @@ export default function Hero() {
             <div className="hero-arch">
               <img
                 src={`${API}/api/upload/profile-pic`}
-                onError={(e) => { e.target.src = '/profile.png' }}
+                onError={(e) => { e.target.src = '/rishusingh.jpg' }}
                 alt="Rishu Rajput – Rishu Kumar Singh, Full-Stack Developer & System Designer"
                 className="hero-photo"
               />
