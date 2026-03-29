@@ -73,6 +73,11 @@ app.use(express.json({ limit: '10mb' }))
 const apiSecretGuard = (req, res, next) => {
   // Allow CORS preflight
   if (req.method === 'OPTIONS') return next()
+  
+  // Bypass guard for all public GET requests (sections data, images, etc.)
+  // We only strictly lock down POST/PUT/DELETE from outside origins.
+  if (req.method === 'GET') return next()
+  
   const secret = req.headers['x-api-secret']
   if (!process.env.API_SECRET || secret === process.env.API_SECRET) return next()
   return res.status(403).json({ error: 'Forbidden: invalid API secret.' })
