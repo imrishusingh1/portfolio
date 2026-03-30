@@ -20,7 +20,7 @@ export default function AdminLogin() {
   }, [isLoggedIn])
 
   useEffect(() => {
-    fetch(`${API}/api/auth/status`)
+    fetch(`${API}/api/auth/status?t=${new Date().getTime()}`, { cache: 'no-store' })
       .then(r => r.json())
       .then(d => setAdminExists(d.adminExists))
       .catch(() => setError('Cannot connect to server'))
