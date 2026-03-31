@@ -182,3 +182,18 @@
   .hero-wind { right: -30px; bottom: 40px; transform: scale(0.8); }
   .wavy-svg { height: 14px; bottom: -6px; }
 }
+
+@media (max-width: 1024px) {
+  .hero-inner { grid-template-columns: 1fr; text-align: center; }
+  .hero-text { align-items: center; }
+  .hero-sub { max-width: 640px; }
+  .hero-photo-wrap { justify-content: center; padding-top: 12px; }
+}
+
+@media (max-width: 480px) {
+  .hero { min-height: auto; }
+  .hero-hello-large { font-size: 56px; gap: 10px; }
+  .hero-headline { font-size: clamp(30px, 10vw, 42px); }
+  .hero-arch-container { width: 270px; height: 320px; }
+  .hero-btns { width: 100%; justify-content: center; }
+}

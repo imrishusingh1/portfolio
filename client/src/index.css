@@ -37,7 +37,7 @@ a { text-decoration: none; color: inherit; }
 ul { list-style: none; }
 
 /* ── Container ── */
-.container { max-width: 1480px; margin: 0 auto; padding: 0 48px; }
+.container { max-width: 1480px; margin: 0 auto; padding: 0 clamp(16px, 4vw, 48px); }
 .section { padding: 96px 0; }
 
 /* ── Tags / Pills ── */
@@ -118,7 +118,20 @@ ul { list-style: none; }
 .btn-dark { background: var(--text-dark); color: var(--white); }
 
 @media (max-width: 768px) {
-  .container { padding: 0 24px; }
   .section { padding: 64px 0; }
+  .btn {
+    width: 100%;
+    max-width: 320px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-title {
+    font-size: clamp(28px, 9vw, 38px);
+  }
+  .section-title-center {
+    font-size: clamp(24px, 8vw, 32px);
+    margin-bottom: 32px;
+  }
 }
 .btn-icon { font-size: 18px; }

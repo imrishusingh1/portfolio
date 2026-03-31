@@ -194,22 +194,54 @@
 .timeline-desc { font-size: 14px; line-height: 1.65; color: #666; }
 
 @media (max-width: 768px) {
-  .about-content {
+  .about-inner {
     grid-template-columns: 1fr;
     gap: 40px;
   }
-  .about-photo-container {
+  .circle-photo-outer {
     width: 280px;
     height: 280px;
     margin: 0 auto;
   }
+  .circle-photo {
+    width: 280px;
+    height: 280px;
+  }
+  .wave-deco {
+    left: -35px;
+    width: 78px;
+    height: 56px;
+  }
+  .exp-badge {
+    top: -14px;
+    right: -8px;
+    transform: scale(0.75);
+    transform-origin: top right;
+  }
   .about-text {
     padding-left: 0;
+    text-align: center;
+    align-items: center;
   }
   .exp-inner { grid-template-columns: 1fr; }
   .exp-left { position: static; }
-  .timeline-item { grid-template-columns: 1fr; }
-  .timeline-line { flex-direction: row; align-items: center; padding: 0 0 8px 0; }
-  .timeline-line::after { display: none; }
-  .timeline-period { text-align: left; }
+  .timeline-item {
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding-bottom: 28px;
+  }
+  .timeline-period { text-align: left; font-size: 12px; }
+  .timeline-divider {
+    min-height: 10px;
+    align-items: flex-start;
+  }
+  .timeline-divider::after { display: none; }
+  .timeline-content { padding-left: 0; }
+}
+
+@media (max-width: 480px) {
+  .about-section { padding: 72px 0; }
+  .experience-section { padding-bottom: 120px; }
+  .about-text p { font-size: 15px; }
+  .timeline-role { font-size: 18px; }
 }

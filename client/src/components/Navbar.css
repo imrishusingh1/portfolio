@@ -55,6 +55,17 @@
   transition: color 0.2s;
 }
 
+@media (max-width: 1200px) {
+  .nav-logo { font-size: 26px; }
+  .nav-links { gap: 22px; }
+  .nav-links li a { font-size: 17px; }
+  .nav-socials a {
+    width: 34px;
+    height: 34px;
+    font-size: 14px;
+  }
+}
+
 .nav-links li a:hover {
   color: var(--purple-accent);
 }
@@ -99,7 +110,7 @@
   margin-left: 16px;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 1024px) {
   .navbar {
     padding: 20px 0;
   }
@@ -118,9 +129,11 @@
 
   .nav-links {
     position: fixed;
-    top: 66px;
+    top: 76px;
     left: -100%;
     width: 100%;
+    max-height: calc(100vh - 76px);
+    overflow-y: auto;
     background: #fff;
     flex-direction: column;
     gap: 0;

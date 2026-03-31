@@ -231,6 +231,35 @@
 }
 
 /* ── Mobile ──────────────────────────────────── */
+@media (max-width: 900px) {
+  .edu-timeline-line {
+    left: 16px;
+    transform: none;
+  }
+
+  .edu-row-right,
+  .edu-row-left {
+    justify-content: flex-start;
+    padding-left: 48px;
+  }
+
+  .edu-row-right .edu-card,
+  .edu-row-left .edu-card {
+    width: 100%;
+    margin: 0;
+  }
+
+  .edu-dot-wrap {
+    left: 16px;
+    transform: translate(-50%, -50%);
+  }
+
+  .edu-row-right .edu-card::after,
+  .edu-row-left .edu-card::after {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .edu-timeline-line {
     left: 16px;
