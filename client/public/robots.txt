@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://rishurajput.com/sitemap.xml
+Sitemap: https://www.rishurajput.com/sitemap.xml
