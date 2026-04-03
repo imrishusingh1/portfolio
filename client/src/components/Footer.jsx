@@ -1,17 +1,38 @@
+import { useContext } from 'react'
 import { FaXTwitter, FaFacebookF, FaInstagram, FaGithub, FaLinkedin } from 'react-icons/fa6'
 import { Link } from 'react-scroll'
+import { SectionDataCtx } from '../context/SectionDataContext'
 import './Footer.css'
 
-const navLinks = ['Home', 'Services', 'About', 'Portfolio', 'Achievements', 'Blog', 'Pricing', 'Contact']
+const allNavLinks = ['Home', 'Services', 'About', 'Portfolio', 'Achievements', 'Education', 'Blog', 'Pricing', 'Contact']
 
 export default function Footer() {
+  const { sections } = useContext(SectionDataCtx)
+
+  const keyMap = {
+    Home: 'hero',
+    Services: 'services',
+    About: 'experiences',
+    Portfolio: 'portfolio',
+    Achievements: 'achievements',
+    Education: 'education',
+    Blog: 'blog',
+    Pricing: 'pricing',
+    Contact: 'contact'
+  }
+
+  const visibleLinks = allNavLinks.filter(link => {
+    if (!sections) return true
+    if (link === 'About') return ('about' in sections || 'experiences' in sections)
+    return keyMap[link] in sections
+  })
   return (
     <footer className="footer">
       <div className="container footer-inner">
         <div className="footer-top">
           <a href="#" className="footer-logo">Rishu Singh</a>
           <nav className="footer-nav">
-            {navLinks.map(link => (
+            {visibleLinks.map(link => (
               <Link key={link} to={link.toLowerCase()} smooth offset={-80} duration={600} className="footer-link">
                 {link}
               </Link>
