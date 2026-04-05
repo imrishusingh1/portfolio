@@ -42,6 +42,7 @@ const visitorSchema = new mongoose.Schema({
             seconds: { type: Number },
         }],
         navClicks: [{ type: String }],
+        socialClicks: [{ type: String }],
         referrer: { type: String, default: '' },
     }],
 })

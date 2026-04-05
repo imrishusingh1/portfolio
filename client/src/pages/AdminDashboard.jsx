@@ -415,10 +415,18 @@ export default function AdminDashboard() {
                                   </div>
                                 )}
                                 {sess.navClicks && sess.navClicks.length > 0 && (
-                                  <div style={{ fontSize: '11px', color: '#666' }}>
+                                  <div style={{ fontSize: '11px', color: '#666', marginTop: '6px' }}>
                                     <span style={{ fontWeight: 600 }}>🖱 Nav clicks:</span>{' '}
                                     {sess.navClicks.map((c, ci) => (
                                       <span key={ci} style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '4px', padding: '1px 6px', marginRight: '4px', display: 'inline-block', marginBottom: '3px' }}>{c}</span>
+                                    ))}
+                                  </div>
+                                )}
+                                {sess.socialClicks && sess.socialClicks.length > 0 && (
+                                  <div style={{ fontSize: '11px', color: '#666', marginTop: '6px' }}>
+                                    <span style={{ fontWeight: 600 }}>🔗 Social clicks:</span>{' '}
+                                    {sess.socialClicks.map((c, ci) => (
+                                      <span key={ci} style={{ background: '#dbeafe', border: '1px solid #93c5fd', color: '#1d4ed8', borderRadius: '4px', padding: '1px 6px', marginRight: '4px', display: 'inline-block', marginBottom: '3px' }}>{c}</span>
                                     ))}
                                   </div>
                                 )}

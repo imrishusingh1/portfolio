@@ -2,19 +2,24 @@ import { useEffect, useRef } from 'react'
 
 const API = import.meta.env.VITE_API_URL || ''
 
+const SOCIAL_LABELS = new Set(['github', 'linkedin', 'x', 'twitter', 'facebook', 'instagram'])
+
 /**
- * Tracks which sections the visitor viewed and for how long (IntersectionObserver),
- * plus which navbar links they clicked.
- * Sends data ONCE via sendBeacon when the tab goes hidden — prevents duplicate sessions.
+ * Tracks:
+ *  - Time spent per section (IntersectionObserver)
+ *  - Navbar + Footer nav link clicks (text links)
+ *  - Social media icon clicks from Navbar AND Footer (via aria-label)
+ * Sends data ONCE via sendBeacon when the tab goes hidden.
  */
 export default function useSessionTracker() {
-  const sectionRef   = useRef({})
-  const navClicksRef = useRef([])
-  const sessionStart = useRef(Date.now())
-  const flushed      = useRef(false)  // prevents double-fire
+  const sectionRef     = useRef({})
+  const navClicksRef   = useRef([])
+  const socialClicksRef = useRef([])
+  const sessionStart   = useRef(Date.now())
+  const flushed        = useRef(false)
 
   useEffect(() => {
-    // ── 1. IntersectionObserver — track time per section ─────────────
+    // ── 1. IntersectionObserver — time per section ────────────────────
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
@@ -36,27 +41,37 @@ export default function useSessionTracker() {
     )
     document.querySelectorAll('section[id]').forEach((el) => observer.observe(el))
 
-    // ── 2. Navbar click tracking ──────────────────────────────────────
-    function handleNavClick(e) {
-      const link = e.target.closest('a, button, li')
-      if (!link) return
-      const text = link.textContent?.trim()
-      if (text && text.length < 30) {
-        navClicksRef.current.push(
-          `${text} @ ${new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })}`
-        )
+    // ── 2. Click tracker — nav links + social icons (whole document) ──
+    function handleClick(e) {
+      const anchor = e.target.closest('a')
+      if (!anchor) return
+
+      const time = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })
+
+      // Social media icons — detected by aria-label on the <a> tag
+      const label = anchor.getAttribute('aria-label')
+      if (label && SOCIAL_LABELS.has(label.toLowerCase())) {
+        const source = anchor.closest('footer') ? 'Footer' : 'Navbar'
+        socialClicksRef.current.push(`${label} (${source}) @ ${time}`)
+        return
+      }
+
+      // Nav / footer text links — only short text labels, not email/logo etc.
+      const text = anchor.textContent?.trim()
+      if (text && text.length < 25 && !text.includes('@') && !anchor.href?.includes('mailto')) {
+        const source = anchor.closest('footer') ? 'Footer' : 'Navbar'
+        navClicksRef.current.push(`${text} (${source}) @ ${time}`)
       }
     }
-    const nav = document.querySelector('nav')
-    if (nav) nav.addEventListener('click', handleNavClick)
 
-    // ── 3. Flush ONCE when tab goes hidden (close / switch / navigate) ─
+    document.addEventListener('click', handleClick)
+
+    // ── 3. Flush ONCE when tab goes hidden ────────────────────────────
     function flushSession() {
-      if (flushed.current) return                        // already sent
-      if (document.visibilityState !== 'hidden') return  // not leaving yet
+      if (flushed.current) return
+      if (document.visibilityState !== 'hidden') return
       flushed.current = true
 
-      // Accrue time for any sections still visible
       const now = Date.now()
       Object.values(sectionRef.current).forEach((data) => {
         if (data.enterTime) {
@@ -70,20 +85,18 @@ export default function useSessionTracker() {
         .map(([name, d]) => ({ name, seconds: Math.round(d.totalMs / 1000) }))
         .sort((a, b) => b.seconds - a.seconds)
 
-      if (sections.length === 0 && navClicksRef.current.length === 0) return
+      if (sections.length === 0 && navClicksRef.current.length === 0 && socialClicksRef.current.length === 0) return
 
       const payload = JSON.stringify({
         sections,
         navClicks: navClicksRef.current,
+        socialClicks: socialClicksRef.current,
         totalSeconds: Math.round((Date.now() - sessionStart.current) / 1000),
         referrer: document.referrer || '',
       })
 
       if (navigator.sendBeacon) {
-        navigator.sendBeacon(
-          `${API}/api/track-session`,
-          new Blob([payload], { type: 'application/json' })
-        )
+        navigator.sendBeacon(`${API}/api/track-session`, new Blob([payload], { type: 'application/json' }))
       } else {
         fetch(`${API}/api/track-session`, {
           method: 'POST',
@@ -98,7 +111,7 @@ export default function useSessionTracker() {
 
     return () => {
       observer.disconnect()
-      if (nav) nav.removeEventListener('click', handleNavClick)
+      document.removeEventListener('click', handleClick)
       document.removeEventListener('visibilitychange', flushSession)
     }
   }, [])
