@@ -312,6 +312,30 @@ app.post('/api/track', async (req, res) => {
   }
 })
 
+// ── POST /api/track-session — section engagement data ────────────
+app.post('/api/track-session', async (req, res) => {
+  try {
+    const ip = getClientIP(req)
+    const { sections = [], navClicks = [], totalSeconds = 0, referrer = '' } = req.body
+
+    if (sections.length === 0 && navClicks.length === 0) {
+      return res.json({ message: 'No session data' })
+    }
+
+    const visitor = await Visitor.findOne({ ip })
+    if (visitor) {
+      visitor.sessions.push({ recordedAt: new Date(), sections, navClicks, totalSeconds, referrer })
+      // keep only last 20 sessions per visitor
+      if (visitor.sessions.length > 20) visitor.sessions = visitor.sessions.slice(-20)
+      await visitor.save()
+    }
+    res.json({ message: 'Session recorded' })
+  } catch (err) {
+    console.error('Track-session error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
 // ── GET /api/visitors/notify-setting — get notification toggle ───
 app.get('/api/visitors/notify-setting', authMiddleware, async (req, res) => {
   try {
@@ -361,6 +385,12 @@ app.get('/api/visitors', authMiddleware, async (req, res) => {
         timestamp_IST: formatIST(visit.timestamp),
         referrer: visit.referrer,
         page: visit.page,
+      })),
+      sessions: (v.sessions || []).slice(-5).reverse().map(s => ({
+        recordedAt_IST: formatIST(s.recordedAt),
+        totalSeconds: s.totalSeconds,
+        sections: s.sections || [],
+        navClicks: s.navClicks || [],
       })),
     }))
 

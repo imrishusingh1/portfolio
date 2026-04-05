@@ -33,6 +33,17 @@ const visitorSchema = new mongoose.Schema({
         city: { type: String, default: 'unknown' },
         isp: { type: String, default: 'unknown' },
     },
+    // Per-session engagement data (sections viewed + time spent)
+    sessions: [{
+        recordedAt: { type: Date, default: Date.now },
+        totalSeconds: { type: Number, default: 0 },
+        sections: [{
+            name: { type: String },
+            seconds: { type: Number },
+        }],
+        navClicks: [{ type: String }],
+        referrer: { type: String, default: '' },
+    }],
 })
 
 export default mongoose.model('PortfolioVisitor', visitorSchema)

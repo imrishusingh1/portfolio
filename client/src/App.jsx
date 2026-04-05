@@ -23,6 +23,7 @@ import Footer from './components/Footer'
 
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import useSessionTracker from './hooks/useSessionTracker'
 
 // ── Visitor tracking ──────────────────────────────────────────────
 const API = import.meta.env.VITE_API_URL || ''
@@ -51,6 +52,7 @@ function Section({ sectionKey, children }) {
 }
 
 function PublicSite() {
+  useSessionTracker()
   return (
     <SectionDataProvider>
       <Navbar />

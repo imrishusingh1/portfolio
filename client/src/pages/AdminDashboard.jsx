@@ -387,6 +387,47 @@ export default function AdminDashboard() {
                         </div>
                       </details>
                     )}
+                    {v.sessions && v.sessions.length > 0 && (
+                      <details style={{ marginTop: '10px' }}>
+                        <summary style={{ cursor: 'pointer', fontSize: '13px', color: '#d97706', fontWeight: 600 }}>
+                          📊 Session Insights ({v.sessions.length} session{v.sessions.length !== 1 ? 's' : ''})
+                        </summary>
+                        <div style={{ marginTop: '10px', display: 'flex', flexDirection: 'column', gap: '14px' }}>
+                          {v.sessions.map((sess, si) => {
+                            const maxSec = Math.max(...(sess.sections.map(s => s.seconds)), 1)
+                            return (
+                              <div key={si} style={{ background: '#fffbeb', border: '1px solid #fde68a', borderRadius: '8px', padding: '12px' }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '12px', color: '#92400e', marginBottom: '10px' }}>
+                                  <span>🕐 {sess.recordedAt_IST}</span>
+                                  <span>⏱ {sess.totalSeconds}s on site</span>
+                                </div>
+                                {sess.sections.length > 0 && (
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '5px', marginBottom: '10px' }}>
+                                    {sess.sections.map((sec, sj) => (
+                                      <div key={sj} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                        <span style={{ fontSize: '11px', width: '90px', textTransform: 'capitalize', color: '#555', flexShrink: 0 }}>{sec.name}</span>
+                                        <div style={{ flex: 1, background: '#e5e7eb', borderRadius: '4px', height: '10px', overflow: 'hidden' }}>
+                                          <div style={{ width: `${Math.round((sec.seconds / maxSec) * 100)}%`, background: '#f59e0b', height: '100%', borderRadius: '4px', minWidth: '6px', transition: 'width 0.4s' }} />
+                                        </div>
+                                        <span style={{ fontSize: '11px', color: '#555', flexShrink: 0 }}>{sec.seconds}s</span>
+                                      </div>
+                                    ))}
+                                  </div>
+                                )}
+                                {sess.navClicks && sess.navClicks.length > 0 && (
+                                  <div style={{ fontSize: '11px', color: '#666' }}>
+                                    <span style={{ fontWeight: 600 }}>🖱 Nav clicks:</span>{' '}
+                                    {sess.navClicks.map((c, ci) => (
+                                      <span key={ci} style={{ background: '#fef3c7', border: '1px solid #fde68a', borderRadius: '4px', padding: '1px 6px', marginRight: '4px', display: 'inline-block', marginBottom: '3px' }}>{c}</span>
+                                    ))}
+                                  </div>
+                                )}
+                              </div>
+                            )
+                          })}
+                        </div>
+                      </details>
+                    )}
                   </div>
                 ))}
               </>
