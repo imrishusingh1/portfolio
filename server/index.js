@@ -16,6 +16,7 @@ import paymentRoutes from './routes/payment.js'
 import reviewRoutes from './routes/reviews.js'
 import Section from './models/Section.js'
 import Visitor from './models/Visitor.js'
+import Setting from './models/Setting.js'
 import authMiddleware from './middleware/auth.js'
 import nodemailer from 'nodemailer'
 
@@ -217,10 +218,15 @@ app.post('/api/track', async (req, res) => {
 
     const ipInfo = await getIPInfo(ip)
 
+    // ── Determine visitor type & save ──────────────────────────────
+    let isReturning = false
+    let visitCount = 1
     const existing = await Visitor.findOne({ ip })
 
     if (existing) {
+      isReturning = true
       existing.visitCount += 1
+      visitCount = existing.visitCount
       existing.lastVisit = new Date()
       existing.lastVisit_IST = formatIST(new Date())
       existing.visits.push({ timestamp: new Date(), timestamp_IST: formatIST(new Date()), referrer, page })
@@ -232,7 +238,6 @@ app.post('/api/track', async (req, res) => {
         existing.location = { country: ipInfo.country, countryCode: ipInfo.countryCode, city: ipInfo.city, isp: ipInfo.isp }
       }
       await existing.save()
-      res.json({ message: 'Welcome back!', visitCount: existing.visitCount })
     } else {
       const now2 = new Date()
       const nowIST = formatIST(now2)
@@ -250,10 +255,85 @@ app.post('/api/track', async (req, res) => {
         location: ipInfo ? { country: ipInfo.country, countryCode: ipInfo.countryCode, city: ipInfo.city, isp: ipInfo.isp } : {},
       })
       await visitor.save()
-      res.json({ message: 'New visitor tracked!', visitCount: 1 })
     }
+
+    // ── Email notification (if enabled) ────────────────────────────
+    try {
+      const notifySetting = await Setting.findOne({ key: 'visitor_notify' })
+      if (notifySetting?.value === 'on' && process.env.EMAIL_USER && process.env.EMAIL_PASS) {
+        const location = ipInfo ? `${ipInfo.city}, ${ipInfo.country}` : 'Unknown'
+        const deviceStr = `${deviceBrand} ${deviceModel} (${deviceType})`.trim()
+        const osStr = `${os.name || 'unknown'} ${os.version || ''}`.trim()
+        const browserStr = `${browser.name || 'unknown'} ${browser.version || ''}`.trim()
+        const visitType = isReturning ? `🔄 Returning Visitor (visit #${visitCount})` : '🆕 New Visitor'
+
+        const transporter = nodemailer.createTransport({
+          service: 'gmail',
+          auth: { user: process.env.EMAIL_USER, pass: process.env.EMAIL_PASS },
+        })
+
+        await transporter.sendMail({
+          from: `"Portfolio Visitor Alert" <${process.env.EMAIL_USER}>`,
+          to: 'rishukrsingh99p@gmail.com',
+          subject: `${visitType} — rishurajput.com`,
+          html: `
+            <div style="font-family:sans-serif;max-width:480px;margin:0 auto;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden">
+              <div style="background:${isReturning ? '#3b82f6' : '#16a34a'};padding:20px 24px">
+                <h2 style="margin:0;color:#fff;font-size:18px">${visitType}</h2>
+                <p style="margin:4px 0 0;color:rgba(255,255,255,0.85);font-size:13px">${formatIST(new Date())}</p>
+              </div>
+              <div style="padding:20px 24px">
+                <table style="width:100%;border-collapse:collapse;font-size:14px">
+                  <tr><td style="padding:8px 0;color:#6b7280;width:120px">📍 Location</td><td style="padding:8px 0;font-weight:600">${location}</td></tr>
+                  <tr><td style="padding:8px 0;color:#6b7280">🌐 ISP</td><td style="padding:8px 0">${ipInfo?.isp || 'Unknown'}</td></tr>
+                  <tr><td style="padding:8px 0;color:#6b7280">🔢 IP</td><td style="padding:8px 0;font-family:monospace">${ip}</td></tr>
+                  <tr><td style="padding:8px 0;color:#6b7280">📱 Device</td><td style="padding:8px 0">${deviceStr}</td></tr>
+                  <tr><td style="padding:8px 0;color:#6b7280">💻 OS</td><td style="padding:8px 0">${osStr}</td></tr>
+                  <tr><td style="padding:8px 0;color:#6b7280">🧭 Browser</td><td style="padding:8px 0">${browserStr}</td></tr>
+                  <tr><td style="padding:8px 0;color:#6b7280">📄 Page</td><td style="padding:8px 0">${page}</td></tr>
+                  ${referrer ? `<tr><td style="padding:8px 0;color:#6b7280">← Referrer</td><td style="padding:8px 0">${referrer}</td></tr>` : ''}
+                </table>
+              </div>
+              <div style="padding:12px 24px;background:#f9fafb;font-size:12px;color:#9ca3af">
+                Disable this in Admin → Visitors → Notification toggle
+              </div>
+            </div>
+          `,
+        })
+      }
+    } catch (mailErr) {
+      console.error('Visitor notify email error:', mailErr.message)
+    }
+
+    res.json({ message: isReturning ? 'Welcome back!' : 'New visitor tracked!', visitCount })
   } catch (err) {
     console.error('Track error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+// ── GET /api/visitors/notify-setting — get notification toggle ───
+app.get('/api/visitors/notify-setting', authMiddleware, async (req, res) => {
+  try {
+    const s = await Setting.findOne({ key: 'visitor_notify' })
+    res.json({ enabled: s?.value === 'on' })
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+// ── PATCH /api/visitors/notify-setting — toggle notification ──────
+app.patch('/api/visitors/notify-setting', authMiddleware, async (req, res) => {
+  try {
+    const { enabled } = req.body
+    const value = enabled ? 'on' : 'off'
+    await Setting.findOneAndUpdate(
+      { key: 'visitor_notify' },
+      { key: 'visitor_notify', value },
+      { upsert: true, new: true }
+    )
+    res.json({ enabled: value === 'on' })
+  } catch (err) {
     res.status(500).json({ error: 'Server error' })
   }
 })

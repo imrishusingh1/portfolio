@@ -28,6 +28,7 @@ export default function AdminDashboard() {
   const [messages, setMessages] = useState([])
   const [adminReviews, setAdminReviews] = useState([])
   const [visitors, setVisitors] = useState(null)
+  const [notifyEnabled, setNotifyEnabled] = useState(false)
   const [activeTab, setActiveTab] = useState('hero')
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
@@ -67,6 +68,31 @@ export default function AdminDashboard() {
       headers: { Authorization: `Bearer ${token}` }
     })
     if (res.ok) setVisitors(await res.json())
+  }
+
+  async function fetchNotifySetting() {
+    const res = await fetch(`${API}/api/visitors/notify-setting`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.ok) {
+      const data = await res.json()
+      setNotifyEnabled(data.enabled)
+    }
+  }
+
+  async function toggleNotify() {
+    const newVal = !notifyEnabled
+    setNotifyEnabled(newVal)
+    const res = await fetch(`${API}/api/visitors/notify-setting`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+      body: JSON.stringify({ enabled: newVal })
+    })
+    if (res.ok) {
+      showToast(newVal ? '🔔 Email notifications ON' : '🔕 Email notifications OFF')
+    } else {
+      setNotifyEnabled(!newVal) // revert on error
+    }
   }
 
   async function deleteReview(id) {
@@ -211,7 +237,7 @@ export default function AdminDashboard() {
           </button>
           <button
             className={`admin-nav-btn ${activeTab === 'visitors' ? 'active' : ''}`}
-            onClick={() => { setActiveTab('visitors'); fetchVisitors() }}
+            onClick={() => { setActiveTab('visitors'); fetchVisitors(); fetchNotifySetting() }}
           >
             👁️ Visitors
           </button>
@@ -300,7 +326,20 @@ export default function AdminDashboard() {
         {/* Visitors */}
         {activeTab === 'visitors' && (
           <div className="admin-panel">
-            <h2>👁️ Visitor Tracker</h2>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '12px', marginBottom: '20px' }}>
+              <h2 style={{ margin: 0 }}>👁️ Visitor Tracker</h2>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '12px', background: notifyEnabled ? '#f0fdf4' : '#fafafa', border: `1px solid ${notifyEnabled ? '#86efac' : '#e5e7eb'}`, borderRadius: '10px', padding: '10px 16px' }}>
+                <span style={{ fontSize: '20px' }}>{notifyEnabled ? '🔔' : '🔕'}</span>
+                <div>
+                  <div style={{ fontSize: '13px', fontWeight: 600, color: '#333' }}>Email Alerts</div>
+                  <div style={{ fontSize: '11px', color: notifyEnabled ? '#16a34a' : '#9ca3af' }}>{notifyEnabled ? 'ON — notifying on every visit' : 'OFF — no notifications'}</div>
+                </div>
+                <label className="toggle-switch" style={{ margin: 0 }}>
+                  <input type="checkbox" checked={notifyEnabled} onChange={toggleNotify} />
+                  <span className="toggle-slider" />
+                </label>
+              </div>
+            </div>
             {!visitors && <p className="admin-empty">Loading visitor data...</p>}
             {visitors && (
               <>
