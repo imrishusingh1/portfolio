@@ -414,7 +414,34 @@ export default function AdminDashboard() {
                                     ))}
                                   </div>
                                 )}
-                                {sess.navClicks && sess.navClicks.length > 0 && (
+                                {/* New unified clicks (new sessions) */}
+                                {sess.clicks && sess.clicks.length > 0 && (() => {
+                                  const typeStyle = {
+                                    social:  { bg: '#dbeafe', border: '#93c5fd', color: '#1d4ed8', icon: '🔗' },
+                                    nav:     { bg: '#fef3c7', border: '#fde68a', color: '#92400e', icon: '🗺' },
+                                    button:  { bg: '#dcfce7', border: '#86efac', color: '#166534', icon: '⚡' },
+                                    link:    { bg: '#f3e8ff', border: '#d8b4fe', color: '#7e22ce', icon: '↗' },
+                                    email:   { bg: '#ccfbf1', border: '#5eead4', color: '#0f766e', icon: '📧' },
+                                    other:   { bg: '#f3f4f6', border: '#d1d5db', color: '#374151', icon: '•' },
+                                  }
+                                  return (
+                                    <div style={{ fontSize: '11px', color: '#666', marginTop: '6px' }}>
+                                      <span style={{ fontWeight: 600 }}>🖱 Clicks:</span>{' '}
+                                      <div style={{ marginTop: '4px', display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+                                        {sess.clicks.map((c, ci) => {
+                                          const s = typeStyle[c.type] || typeStyle.other
+                                          return (
+                                            <span key={ci} title={c.time} style={{ background: s.bg, border: `1px solid ${s.border}`, color: s.color, borderRadius: '4px', padding: '2px 7px', fontSize: '11px', display: 'inline-flex', alignItems: 'center', gap: '3px' }}>
+                                              <span>{s.icon}</span>{c.label}
+                                            </span>
+                                          )
+                                        })}
+                                      </div>
+                                    </div>
+                                  )
+                                })()}
+                                {/* Legacy nav clicks (older sessions) */}
+                                {(!sess.clicks || sess.clicks.length === 0) && sess.navClicks && sess.navClicks.length > 0 && (
                                   <div style={{ fontSize: '11px', color: '#666', marginTop: '6px' }}>
                                     <span style={{ fontWeight: 600 }}>🖱 Nav clicks:</span>{' '}
                                     {sess.navClicks.map((c, ci) => (
@@ -422,7 +449,7 @@ export default function AdminDashboard() {
                                     ))}
                                   </div>
                                 )}
-                                {sess.socialClicks && sess.socialClicks.length > 0 && (
+                                {(!sess.clicks || sess.clicks.length === 0) && sess.socialClicks && sess.socialClicks.length > 0 && (
                                   <div style={{ fontSize: '11px', color: '#666', marginTop: '6px' }}>
                                     <span style={{ fontWeight: 600 }}>🔗 Social clicks:</span>{' '}
                                     {sess.socialClicks.map((c, ci) => (

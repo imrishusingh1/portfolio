@@ -316,15 +316,15 @@ app.post('/api/track', async (req, res) => {
 app.post('/api/track-session', async (req, res) => {
   try {
     const ip = getClientIP(req)
-    const { sections = [], navClicks = [], socialClicks = [], totalSeconds = 0, referrer = '' } = req.body
+    const { sections = [], clicks = [], navClicks = [], socialClicks = [], totalSeconds = 0, referrer = '' } = req.body
 
-    if (sections.length === 0 && navClicks.length === 0 && socialClicks.length === 0) {
+    if (sections.length === 0 && clicks.length === 0 && navClicks.length === 0 && socialClicks.length === 0) {
       return res.json({ message: 'No session data' })
     }
 
     const visitor = await Visitor.findOne({ ip })
     if (visitor) {
-      visitor.sessions.push({ recordedAt: new Date(), sections, navClicks, socialClicks, totalSeconds, referrer })
+      visitor.sessions.push({ recordedAt: new Date(), sections, clicks, navClicks, socialClicks, totalSeconds, referrer })
       // keep only last 20 sessions per visitor
       if (visitor.sessions.length > 20) visitor.sessions = visitor.sessions.slice(-20)
       await visitor.save()
@@ -390,6 +390,7 @@ app.get('/api/visitors', authMiddleware, async (req, res) => {
         recordedAt_IST: formatIST(s.recordedAt),
         totalSeconds: s.totalSeconds,
         sections: s.sections || [],
+        clicks: s.clicks || [],
         navClicks: s.navClicks || [],
         socialClicks: s.socialClicks || [],
       })),

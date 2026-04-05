@@ -41,8 +41,13 @@ const visitorSchema = new mongoose.Schema({
             name: { type: String },
             seconds: { type: Number },
         }],
-        navClicks: [{ type: String }],
-        socialClicks: [{ type: String }],
+        clicks: [{
+            type: { type: String },   // social | nav | button | link | email
+            label: { type: String },
+            time: { type: String },
+        }],
+        navClicks: [{ type: String }],    // legacy
+        socialClicks: [{ type: String }], // legacy
         referrer: { type: String, default: '' },
     }],
 })

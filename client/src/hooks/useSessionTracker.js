@@ -4,19 +4,77 @@ const API = import.meta.env.VITE_API_URL || ''
 
 const SOCIAL_LABELS = new Set(['github', 'linkedin', 'x', 'twitter', 'facebook', 'instagram'])
 
+/** Find the meaningful source label (which section/area the click came from) */
+function getSource(el) {
+  if (el.closest('header') || el.closest('.navbar')) return 'Navbar'
+  if (el.closest('footer')) return 'Footer'
+  const section = el.closest('section[id]')
+  if (section) {
+    const id = section.id
+    return id.charAt(0).toUpperCase() + id.slice(1)
+  }
+  return 'Page'
+}
+
+/** Classify the click and return a structured record, or null to ignore */
+function classifyClick(el, time) {
+  const source = getSource(el)
+
+  // ── Anchor tags ──────────────────────────────────────────────────
+  const anchor = el.closest('a')
+  if (anchor) {
+    const label = anchor.getAttribute('aria-label')
+    const href  = anchor.getAttribute('href') || ''
+    const text  = anchor.textContent?.trim()
+
+    // Social icon (has aria-label matching a platform)
+    if (label && SOCIAL_LABELS.has(label.toLowerCase())) {
+      return { type: 'social', label: `${label} (${source})`, time }
+    }
+
+    // Email link
+    if (href.startsWith('mailto:')) {
+      return { type: 'email', label: `Email: ${href.replace('mailto:', '')} (${source})`, time }
+    }
+
+    // External link
+    if (href.startsWith('http') && !href.includes('rishurajput.com')) {
+      const display = text?.slice(0, 40) || label || href.split('/')[2] || 'External link'
+      return { type: 'link', label: `↗ ${display} (${source})`, time }
+    }
+
+    // Internal nav / scroll link
+    if (text && text.length < 30 && !text.includes('@')) {
+      return { type: 'nav', label: `${text} (${source})`, time }
+    }
+
+    return null
+  }
+
+  // ── Buttons ───────────────────────────────────────────────────────
+  const button = el.closest('button, [role="button"]')
+  if (button) {
+    const text  = button.textContent?.trim().slice(0, 50)
+    const label = button.getAttribute('aria-label')
+    const display = text || label || 'Button'
+    // Skip hamburger / toggle / close buttons with icon-only content
+    if (display.length < 2) return null
+    return { type: 'button', label: `${display} (${source})`, time }
+  }
+
+  return null
+}
+
 /**
- * Tracks:
- *  - Time spent per section (IntersectionObserver)
- *  - Navbar + Footer nav link clicks (text links)
- *  - Social media icon clicks from Navbar AND Footer (via aria-label)
+ * Universal click + section-time tracker.
+ * Tracks: nav links, social icons, CTA buttons, external links, emails — from anywhere on the page.
  * Sends data ONCE via sendBeacon when the tab goes hidden.
  */
 export default function useSessionTracker() {
-  const sectionRef     = useRef({})
-  const navClicksRef   = useRef([])
-  const socialClicksRef = useRef([])
-  const sessionStart   = useRef(Date.now())
-  const flushed        = useRef(false)
+  const sectionRef  = useRef({})
+  const clicksRef   = useRef([])
+  const sessionStart = useRef(Date.now())
+  const flushed     = useRef(false)
 
   useEffect(() => {
     // ── 1. IntersectionObserver — time per section ────────────────────
@@ -41,29 +99,12 @@ export default function useSessionTracker() {
     )
     document.querySelectorAll('section[id]').forEach((el) => observer.observe(el))
 
-    // ── 2. Click tracker — nav links + social icons (whole document) ──
+    // ── 2. Universal click tracker ────────────────────────────────────
     function handleClick(e) {
-      const anchor = e.target.closest('a')
-      if (!anchor) return
-
       const time = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })
-
-      // Social media icons — detected by aria-label on the <a> tag
-      const label = anchor.getAttribute('aria-label')
-      if (label && SOCIAL_LABELS.has(label.toLowerCase())) {
-        const source = anchor.closest('footer') ? 'Footer' : 'Navbar'
-        socialClicksRef.current.push(`${label} (${source}) @ ${time}`)
-        return
-      }
-
-      // Nav / footer text links — only short text labels, not email/logo etc.
-      const text = anchor.textContent?.trim()
-      if (text && text.length < 25 && !text.includes('@') && !anchor.href?.includes('mailto')) {
-        const source = anchor.closest('footer') ? 'Footer' : 'Navbar'
-        navClicksRef.current.push(`${text} (${source}) @ ${time}`)
-      }
+      const record = classifyClick(e.target, time)
+      if (record) clicksRef.current.push(record)
     }
-
     document.addEventListener('click', handleClick)
 
     // ── 3. Flush ONCE when tab goes hidden ────────────────────────────
@@ -85,12 +126,14 @@ export default function useSessionTracker() {
         .map(([name, d]) => ({ name, seconds: Math.round(d.totalMs / 1000) }))
         .sort((a, b) => b.seconds - a.seconds)
 
-      if (sections.length === 0 && navClicksRef.current.length === 0 && socialClicksRef.current.length === 0) return
+      if (sections.length === 0 && clicksRef.current.length === 0) return
 
       const payload = JSON.stringify({
         sections,
-        navClicks: navClicksRef.current,
-        socialClicks: socialClicksRef.current,
+        clicks: clicksRef.current,
+        // keep legacy fields empty (old sessions still show their data from DB)
+        navClicks: [],
+        socialClicks: [],
         totalSeconds: Math.round((Date.now() - sessionStart.current) / 1000),
         referrer: document.referrer || '',
       })
