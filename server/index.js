@@ -7,6 +7,7 @@ import { fileURLToPath } from 'url'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import slowDown from 'express-slow-down'
+import UAParser from 'ua-parser-js'
 
 import authRoutes from './routes/auth.js'
 import sectionRoutes from './routes/sections.js'
@@ -14,6 +15,8 @@ import uploadRoutes from './routes/upload.js'
 import paymentRoutes from './routes/payment.js'
 import reviewRoutes from './routes/reviews.js'
 import Section from './models/Section.js'
+import Visitor from './models/Visitor.js'
+import authMiddleware from './middleware/auth.js'
 import nodemailer from 'nodemailer'
 
 dotenv.config()
@@ -137,6 +140,155 @@ app.get('/api/messages', async (_req, res) => {
 })
 
 app.get('/', (_req, res) => res.send('Portfolio API running 🚀'))
+
+// ── Visitor Tracking Helpers ─────────────────────────────────────
+
+function formatIST(date) {
+  return new Date(date).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })
+}
+
+function getClientIP(req) {
+  const forwarded = req.headers['x-forwarded-for']
+  if (forwarded) return forwarded.split(',')[0].trim()
+  return req.connection?.remoteAddress || req.socket?.remoteAddress || 'unknown'
+}
+
+async function getIPInfo(ip) {
+  if (ip === '::1' || ip === '127.0.0.1' || ip === 'unknown') {
+    return { country: 'Localhost', countryCode: 'LOCAL', city: 'Local', isp: 'Local' }
+  }
+  try {
+    const resp = await fetch(`http://ip-api.com/json/${ip}?fields=status,country,countryCode,city,isp,proxy,hosting`)
+    const data = await resp.json()
+    if (data.status === 'success') {
+      return {
+        country: data.country || 'Unknown',
+        countryCode: data.countryCode || 'XX',
+        city: data.city || 'Unknown',
+        isp: data.isp || 'Unknown',
+      }
+    }
+    return null
+  } catch (err) {
+    console.error('IP lookup failed:', err.message)
+    return null
+  }
+}
+
+// Deduplicate: ignore same IP within 5 seconds
+const recentTracks = new Map()
+
+// ── POST /api/track — called when someone visits the portfolio ───
+app.post('/api/track', async (req, res) => {
+  try {
+    const ip = getClientIP(req)
+
+    // Deduplicate
+    const now = Date.now()
+    const lastTrack = recentTracks.get(ip)
+    if (lastTrack && now - lastTrack < 5000) {
+      return res.json({ message: 'Already tracked recently', deduplicated: true })
+    }
+    recentTracks.set(ip, now)
+    if (recentTracks.size > 100) {
+      for (const [key, val] of recentTracks) {
+        if (now - val > 10000) recentTracks.delete(key)
+      }
+    }
+
+    const userAgentString = req.headers['user-agent'] || ''
+    const referrer = req.body.referrer || ''
+    const page = req.body.page || '/'
+
+    const ua = new UAParser(userAgentString)
+    const device = ua.getDevice()
+    const os = ua.getOS()
+    const browser = ua.getBrowser()
+
+    let deviceType = device.type || 'desktop'
+    if (!device.type) {
+      const osName = (os.name || '').toLowerCase()
+      if (osName.includes('ios') || osName.includes('android')) deviceType = 'mobile'
+      else deviceType = 'desktop'
+    }
+
+    const deviceBrand = device.vendor || os.name || 'unknown'
+    const deviceModel = device.model || deviceType
+
+    const ipInfo = await getIPInfo(ip)
+
+    const existing = await Visitor.findOne({ ip })
+
+    if (existing) {
+      existing.visitCount += 1
+      existing.lastVisit = new Date()
+      existing.lastVisit_IST = formatIST(new Date())
+      existing.visits.push({ timestamp: new Date(), timestamp_IST: formatIST(new Date()), referrer, page })
+      existing.device = { type: deviceType, brand: deviceBrand, model: deviceModel }
+      existing.os = { name: os.name || 'unknown', version: os.version || '' }
+      existing.browser = { name: browser.name || 'unknown', version: browser.version || '' }
+      existing.userAgent = userAgentString
+      if (ipInfo) {
+        existing.location = { country: ipInfo.country, countryCode: ipInfo.countryCode, city: ipInfo.city, isp: ipInfo.isp }
+      }
+      await existing.save()
+      res.json({ message: 'Welcome back!', visitCount: existing.visitCount })
+    } else {
+      const now2 = new Date()
+      const nowIST = formatIST(now2)
+      const visitor = new Visitor({
+        ip,
+        device: { type: deviceType, brand: deviceBrand, model: deviceModel },
+        os: { name: os.name || 'unknown', version: os.version || '' },
+        browser: { name: browser.name || 'unknown', version: browser.version || '' },
+        userAgent: userAgentString,
+        firstVisit: now2,
+        firstVisit_IST: nowIST,
+        lastVisit: now2,
+        lastVisit_IST: nowIST,
+        visits: [{ timestamp: now2, timestamp_IST: nowIST, referrer, page }],
+        location: ipInfo ? { country: ipInfo.country, countryCode: ipInfo.countryCode, city: ipInfo.city, isp: ipInfo.isp } : {},
+      })
+      await visitor.save()
+      res.json({ message: 'New visitor tracked!', visitCount: 1 })
+    }
+  } catch (err) {
+    console.error('Track error:', err)
+    res.status(500).json({ error: 'Server error' })
+  }
+})
+
+// ── GET /api/visitors — admin-only endpoint ───────────────────────
+app.get('/api/visitors', authMiddleware, async (req, res) => {
+  try {
+    const visitors = await Visitor.find().sort({ lastVisit: -1 })
+    const totalVisits = visitors.reduce((sum, v) => sum + v.visitCount, 0)
+
+    const formatted = visitors.map(v => ({
+      _id: v._id,
+      ip: v.ip,
+      visitCount: v.visitCount,
+      device: `${v.device.brand} ${v.device.model}`.trim() || v.device.type,
+      deviceType: v.device.type,
+      os: `${v.os.name} ${v.os.version}`.trim(),
+      browser: `${v.browser.name} ${v.browser.version}`.trim(),
+      location: v.location ? `${v.location.city}, ${v.location.country}` : 'unknown',
+      countryCode: v.location?.countryCode || 'XX',
+      isp: v.location?.isp || 'unknown',
+      firstVisit_IST: formatIST(v.firstVisit),
+      lastVisit_IST: formatIST(v.lastVisit),
+      visits: (v.visits || []).map(visit => ({
+        timestamp_IST: formatIST(visit.timestamp),
+        referrer: visit.referrer,
+        page: visit.page,
+      })),
+    }))
+
+    res.json({ totalUniqueVisitors: visitors.length, totalVisits, visitors: formatted })
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' })
+  }
+})
 
 // ── Seed default sections ──
 const defaultSections = {

@@ -27,6 +27,7 @@ export default function AdminDashboard() {
   const [sections, setSections] = useState([])
   const [messages, setMessages] = useState([])
   const [adminReviews, setAdminReviews] = useState([])
+  const [visitors, setVisitors] = useState(null)
   const [activeTab, setActiveTab] = useState('hero')
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
@@ -59,6 +60,13 @@ export default function AdminDashboard() {
       headers: { Authorization: `Bearer ${token}` }
     })
     if (res.ok) setAdminReviews(await res.json())
+  }
+
+  async function fetchVisitors() {
+    const res = await fetch(`${API}/api/visitors`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    if (res.ok) setVisitors(await res.json())
   }
 
   async function deleteReview(id) {
@@ -201,6 +209,12 @@ export default function AdminDashboard() {
           >
             🖼️ Profile Photo
           </button>
+          <button
+            className={`admin-nav-btn ${activeTab === 'visitors' ? 'active' : ''}`}
+            onClick={() => { setActiveTab('visitors'); fetchVisitors() }}
+          >
+            👁️ Visitors
+          </button>
         </nav>
         <button className="admin-logout-btn" onClick={() => { logout(); navigate('/admin') }}>
           Logout
@@ -212,7 +226,7 @@ export default function AdminDashboard() {
         {toast && <div className="admin-toast">{toast}</div>}
 
         {/* Section editor */}
-        {activeTab !== 'messages' && activeTab !== 'resume' && activeTab !== 'profile' && activeTab !== 'reviews' && currentSection && (
+        {activeTab !== 'messages' && activeTab !== 'resume' && activeTab !== 'profile' && activeTab !== 'reviews' && activeTab !== 'visitors' && currentSection && (
           <SectionEditor
             section={currentSection}
             onSave={saveSection}
@@ -280,6 +294,64 @@ export default function AdminDashboard() {
             <a href={`${API}/uploads/resume.pdf`} target="_blank" rel="noreferrer" className="admin-preview-link">
               Preview Current Resume ↗
             </a>
+          </div>
+        )}
+
+        {/* Visitors */}
+        {activeTab === 'visitors' && (
+          <div className="admin-panel">
+            <h2>👁️ Visitor Tracker</h2>
+            {!visitors && <p className="admin-empty">Loading visitor data...</p>}
+            {visitors && (
+              <>
+                <div style={{ display: 'flex', gap: '24px', marginBottom: '24px', flexWrap: 'wrap' }}>
+                  <div style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '12px', padding: '16px 24px', minWidth: '160px' }}>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#16a34a' }}>{visitors.totalUniqueVisitors}</div>
+                    <div style={{ fontSize: '13px', color: '#555', marginTop: '4px' }}>Unique Visitors</div>
+                  </div>
+                  <div style={{ background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '12px', padding: '16px 24px', minWidth: '160px' }}>
+                    <div style={{ fontSize: '28px', fontWeight: 800, color: '#2563eb' }}>{visitors.totalVisits}</div>
+                    <div style={{ fontSize: '13px', color: '#555', marginTop: '4px' }}>Total Page Views</div>
+                  </div>
+                </div>
+                {visitors.visitors.length === 0 && <p className="admin-empty">No visitors tracked yet.</p>}
+                {visitors.visitors.map((v, i) => (
+                  <div key={v._id || i} className="msg-card" style={{ marginBottom: '16px' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '8px' }}>
+                      <div>
+                        <strong style={{ fontFamily: 'monospace', fontSize: '15px' }}>{v.ip}</strong>
+                        <span style={{ marginLeft: '10px', background: '#e0f2fe', color: '#0369a1', borderRadius: '6px', padding: '2px 8px', fontSize: '12px', fontWeight: 600 }}>
+                          {v.visitCount} visit{v.visitCount !== 1 ? 's' : ''}
+                        </span>
+                      </div>
+                      <span style={{ fontSize: '12px', color: '#888' }}>Last: {v.lastVisit_IST}</span>
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: '8px', marginTop: '12px' }}>
+                      <div style={{ fontSize: '13px' }}>📍 <strong>Location:</strong> {v.location}</div>
+                      <div style={{ fontSize: '13px' }}>🌐 <strong>ISP:</strong> {v.isp}</div>
+                      <div style={{ fontSize: '13px' }}>📱 <strong>Device:</strong> {v.deviceType} — {v.device}</div>
+                      <div style={{ fontSize: '13px' }}>💻 <strong>OS:</strong> {v.os}</div>
+                      <div style={{ fontSize: '13px' }}>🧭 <strong>Browser:</strong> {v.browser}</div>
+                      <div style={{ fontSize: '13px' }}>🕐 <strong>First visit:</strong> {v.firstVisit_IST}</div>
+                    </div>
+                    {v.visits && v.visits.length > 0 && (
+                      <details style={{ marginTop: '10px' }}>
+                        <summary style={{ cursor: 'pointer', fontSize: '13px', color: '#5865F2', fontWeight: 600 }}>📋 Visit History ({v.visits.length})</summary>
+                        <div style={{ marginTop: '8px', maxHeight: '200px', overflowY: 'auto' }}>
+                          {v.visits.map((visit, j) => (
+                            <div key={j} style={{ fontSize: '12px', padding: '6px 10px', background: j % 2 === 0 ? '#f9fafb' : '#fff', borderRadius: '6px', marginBottom: '4px' }}>
+                              <span style={{ color: '#888' }}>{visit.timestamp_IST}</span>
+                              {visit.page && <span style={{ marginLeft: '10px', color: '#333' }}>📄 {visit.page}</span>}
+                              {visit.referrer && <span style={{ marginLeft: '10px', color: '#888' }}>←  {visit.referrer}</span>}
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    )}
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         )}
 

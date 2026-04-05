@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './context/AuthContext'
 import { SectionDataProvider, useSectionData } from './context/SectionDataContext'
@@ -22,6 +23,25 @@ import Footer from './components/Footer'
 
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+
+// ── Visitor tracking ──────────────────────────────────────────────
+const API = import.meta.env.VITE_API_URL || ''
+
+function useVisitorTracking() {
+  useEffect(() => {
+    // Only track once per browser session
+    if (sessionStorage.getItem('_tracked')) return
+    sessionStorage.setItem('_tracked', '1')
+    fetch(`${API}/api/track`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        referrer: document.referrer || '',
+        page: window.location.pathname,
+      }),
+    }).catch(() => {}) // silent fail — never block the UI
+  }, [])
+}
 
 /* Wrapper that hides a section when it's disabled in the admin panel */
 function Section({ sectionKey, children }) {
@@ -56,6 +76,7 @@ function PublicSite() {
 }
 
 function App() {
+  useVisitorTracking()
   return (
     <BrowserRouter>
       <AuthProvider>
