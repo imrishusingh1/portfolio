@@ -15,29 +15,56 @@ function getSource(el) {
   return 'Page'
 }
 
+function getClosestElement(el, selector) {
+  while (el && el !== document) {
+    if (el.matches && el.matches(selector)) return el
+    el = el.parentNode
+  }
+  return null
+}
+
 function classifyClick(el, time) {
+  if (!el) return null
   const source = getSource(el)
-  const anchor = el.closest('a')
+
+  // ── Anchor tags ──────────────────────────────────────────────────
+  const anchor = getClosestElement(el, 'a')
   if (anchor) {
     const label = anchor.getAttribute('aria-label')
     const href  = anchor.getAttribute('href') || ''
     const text  = anchor.textContent?.trim()
+
+    // 1. Social icon
     if (label && SOCIAL_LABELS.has(label.toLowerCase())) {
       return { type: 'social', label: `${label} (${source})`, time }
     }
+
+    // 2. Email link
     if (href.startsWith('mailto:')) {
       return { type: 'email', label: `Email: ${href.replace('mailto:', '')} (${source})`, time }
     }
+
+    // 3. Download link
+    if (anchor.hasAttribute('download') || href.includes('download-resume')) {
+      return { type: 'button', label: `${text || 'Download'} (${source})`, time }
+    }
+
+    // 4. External link
     if (href.startsWith('http') && !href.includes('rishurajput.com')) {
       const display = text?.slice(0, 40) || label || href.split('/')[2] || 'External link'
       return { type: 'link', label: `↗ ${display} (${source})`, time }
     }
-    if (text && text.length < 30 && !text.includes('@')) {
+
+    // 5. Internal Nav / Scroll Link
+    if (text && text.length < 40 && !text.includes('@')) {
       return { type: 'nav', label: `${text} (${source})`, time }
     }
+
     return null
   }
-  const button = el.closest('button, [role="button"]')
+
+  // ── Buttons ───────────────────────────────────────────────────────
+  const button = getClosestElement(el, 'button, [role="button"]')
   if (button) {
     const text  = button.textContent?.trim().slice(0, 50)
     const label = button.getAttribute('aria-label')
@@ -45,6 +72,7 @@ function classifyClick(el, time) {
     if (display.length < 2) return null
     return { type: 'button', label: `${display} (${source})`, time }
   }
+
   return null
 }
 
@@ -95,11 +123,15 @@ export default function useSessionTracker() {
 
     // ── 3. Universal click tracker ────────────────────────────────────
     function handleClick(e) {
+      if (!e.target) return
       const time = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })
       const record = classifyClick(e.target, time)
-      if (record) clicksRef.current.push(record)
+      if (record) {
+        clicksRef.current.push(record)
+      }
     }
-    document.addEventListener('click', handleClick)
+    // Use capture: true to intercept click BEFORE any element is unmounted or stops propagation!
+    document.addEventListener('click', handleClick, true)
 
     // ── 4. Flush ONCE when tab goes hidden ────────────────────────────
     function flushSession() {
@@ -148,7 +180,7 @@ export default function useSessionTracker() {
     return () => {
       intersectionObserver.disconnect()
       mutationObserver.disconnect()
-      document.removeEventListener('click', handleClick)
+      document.removeEventListener('click', handleClick, true)
       document.removeEventListener('visibilitychange', flushSession)
     }
   }, [])
