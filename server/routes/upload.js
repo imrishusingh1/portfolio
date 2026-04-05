@@ -94,9 +94,35 @@ router.get('/resume/status', async (req, res) => {
 router.get('/download-resume', async (req, res) => {
   try {
     const s = await Setting.findOne({ key: 'resume_url' })
-    if (s?.value) return res.redirect(s.value)
-    res.status(404).send('Resume not found')
-  } catch { res.status(404).send('Resume not found') }
+    if (!s?.value) return res.status(404).send('Resume not found. Please upload from Admin Dashboard.')
+
+    // Force browser download by fetching from Cloudinary and streaming with proper headers
+    let url = s.value
+    // Add fl_attachment to Cloudinary URL so it returns Content-Disposition: attachment
+    if (url.includes('cloudinary.com') && !url.includes('fl_attachment')) {
+      url = url.replace('/upload/', '/upload/fl_attachment/')
+    }
+
+    const response = await fetch(url)
+    if (!response.ok) return res.status(404).send('Resume file unavailable')
+
+    res.setHeader('Content-Type', 'application/pdf')
+    res.setHeader('Content-Disposition', 'attachment; filename="Rishu_Resume.pdf"')
+    res.setHeader('Content-Length', response.headers.get('content-length') || '')
+
+    // Stream the PDF bytes directly to the client
+    const reader = response.body.getReader()
+    const pump = async () => {
+      const { done, value } = await reader.read()
+      if (done) return res.end()
+      res.write(Buffer.from(value))
+      return pump()
+    }
+    await pump()
+  } catch (err) {
+    console.error('Resume download error:', err)
+    res.status(500).send('Download error')
+  }
 })
 
 // ── Generic Image ────────────────────────────────────────────────

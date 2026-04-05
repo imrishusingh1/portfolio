@@ -4,7 +4,6 @@ const API = import.meta.env.VITE_API_URL || ''
 
 const SOCIAL_LABELS = new Set(['github', 'linkedin', 'x', 'twitter', 'facebook', 'instagram'])
 
-/** Find the meaningful source label (which section/area the click came from) */
 function getSource(el) {
   if (el.closest('header') || el.closest('.navbar')) return 'Navbar'
   if (el.closest('footer')) return 'Footer'
@@ -16,69 +15,49 @@ function getSource(el) {
   return 'Page'
 }
 
-/** Classify the click and return a structured record, or null to ignore */
 function classifyClick(el, time) {
   const source = getSource(el)
-
-  // ── Anchor tags ──────────────────────────────────────────────────
   const anchor = el.closest('a')
   if (anchor) {
     const label = anchor.getAttribute('aria-label')
     const href  = anchor.getAttribute('href') || ''
     const text  = anchor.textContent?.trim()
-
-    // Social icon (has aria-label matching a platform)
     if (label && SOCIAL_LABELS.has(label.toLowerCase())) {
       return { type: 'social', label: `${label} (${source})`, time }
     }
-
-    // Email link
     if (href.startsWith('mailto:')) {
       return { type: 'email', label: `Email: ${href.replace('mailto:', '')} (${source})`, time }
     }
-
-    // External link
     if (href.startsWith('http') && !href.includes('rishurajput.com')) {
       const display = text?.slice(0, 40) || label || href.split('/')[2] || 'External link'
       return { type: 'link', label: `↗ ${display} (${source})`, time }
     }
-
-    // Internal nav / scroll link
     if (text && text.length < 30 && !text.includes('@')) {
       return { type: 'nav', label: `${text} (${source})`, time }
     }
-
     return null
   }
-
-  // ── Buttons ───────────────────────────────────────────────────────
   const button = el.closest('button, [role="button"]')
   if (button) {
     const text  = button.textContent?.trim().slice(0, 50)
     const label = button.getAttribute('aria-label')
     const display = text || label || 'Button'
-    // Skip hamburger / toggle / close buttons with icon-only content
     if (display.length < 2) return null
     return { type: 'button', label: `${display} (${source})`, time }
   }
-
   return null
 }
 
-/**
- * Universal click + section-time tracker.
- * Tracks: nav links, social icons, CTA buttons, external links, emails — from anywhere on the page.
- * Sends data ONCE via sendBeacon when the tab goes hidden.
- */
 export default function useSessionTracker() {
-  const sectionRef  = useRef({})
-  const clicksRef   = useRef([])
+  const sectionRef   = useRef({})
+  const clicksRef    = useRef([])
   const sessionStart = useRef(Date.now())
-  const flushed     = useRef(false)
+  const flushed      = useRef(false)
+  const observedIds  = useRef(new Set())  // track which sections are already observed
 
   useEffect(() => {
     // ── 1. IntersectionObserver — time per section ────────────────────
-    const observer = new IntersectionObserver(
+    const intersectionObserver = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           const id = entry.target.id
@@ -97,9 +76,24 @@ export default function useSessionTracker() {
       },
       { threshold: 0.2 }
     )
-    document.querySelectorAll('section[id]').forEach((el) => observer.observe(el))
 
-    // ── 2. Universal click tracker ────────────────────────────────────
+    // Observe a section only once
+    function observeSection(el) {
+      if (!el.id || observedIds.current.has(el.id)) return
+      observedIds.current.add(el.id)
+      intersectionObserver.observe(el)
+    }
+
+    // Observe all currently-present sections
+    document.querySelectorAll('section[id]').forEach(observeSection)
+
+    // ── 2. MutationObserver — catch sections added after data loads ───
+    const mutationObserver = new MutationObserver(() => {
+      document.querySelectorAll('section[id]').forEach(observeSection)
+    })
+    mutationObserver.observe(document.body, { childList: true, subtree: true })
+
+    // ── 3. Universal click tracker ────────────────────────────────────
     function handleClick(e) {
       const time = new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' })
       const record = classifyClick(e.target, time)
@@ -107,7 +101,7 @@ export default function useSessionTracker() {
     }
     document.addEventListener('click', handleClick)
 
-    // ── 3. Flush ONCE when tab goes hidden ────────────────────────────
+    // ── 4. Flush ONCE when tab goes hidden ────────────────────────────
     function flushSession() {
       if (flushed.current) return
       if (document.visibilityState !== 'hidden') return
@@ -131,7 +125,6 @@ export default function useSessionTracker() {
       const payload = JSON.stringify({
         sections,
         clicks: clicksRef.current,
-        // keep legacy fields empty (old sessions still show their data from DB)
         navClicks: [],
         socialClicks: [],
         totalSeconds: Math.round((Date.now() - sessionStart.current) / 1000),
@@ -153,7 +146,8 @@ export default function useSessionTracker() {
     document.addEventListener('visibilitychange', flushSession)
 
     return () => {
-      observer.disconnect()
+      intersectionObserver.disconnect()
+      mutationObserver.disconnect()
       document.removeEventListener('click', handleClick)
       document.removeEventListener('visibilitychange', flushSession)
     }
