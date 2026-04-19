@@ -73,8 +73,7 @@
 .wavy-word {
   position: relative;
   display: inline-block;
-  white-space: normal; /* Allow wrapping on very small screens */
-  word-break: break-word;
+  white-space: nowrap;
 }
 .wavy-svg {
   position: absolute;
@@ -192,7 +191,7 @@
 @media (max-width: 480px) {
   .hero { min-height: auto; padding-top: 40px; }
   .hero-hello-large { font-size: 48px; gap: 10px; }
-  .hero-headline { font-size: clamp(28px, 9vw, 36px); }
+  .hero-headline { font-size: clamp(22px, 7.5vw, 32px); } /* Smaller to fit Full-Stack Web Developer on one line */
   .hero-arch-container { width: 100%; max-width: 320px; height: 340px; }
   .hero-btns { width: 100%; justify-content: center; flex-direction: column; }
   .hero-btn { width: 100%; }
