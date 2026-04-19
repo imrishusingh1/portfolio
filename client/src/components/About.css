@@ -223,8 +223,12 @@
     text-align: center;
     align-items: center;
   }
+  .about-text p {
+    text-align: left; /* Left align paragraphs instead of centering for better readability */
+  }
   .exp-inner { grid-template-columns: 1fr; }
-  .exp-left { position: static; }
+  .exp-left { position: static; text-align: left; }
+  .exp-left p { text-align: left; }
   .timeline-item {
     grid-template-columns: 32px 1fr;
     grid-template-rows: auto auto;
