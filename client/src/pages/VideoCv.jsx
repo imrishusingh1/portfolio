@@ -414,15 +414,21 @@ export default function VideoCv() {
               <p>Video resume • Updated {new Date().getFullYear()}</p>
             </div>
           </div>
-          <a
-            href={`${API}/api/upload/download-resume`}
-            download
-            className="vcv-download-btn"
-            target="_blank"
-            rel="noreferrer"
-          >
-            <IconDownload /> Download Text CV
-          </a>
+          {videoSrc ? (
+            <a
+              href={videoSrc.includes('cloudinary.com') ? videoSrc.replace('/upload/', '/upload/fl_attachment/') : videoSrc}
+              download
+              className="vcv-download-btn"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <IconDownload /> Download Video CV
+            </a>
+          ) : (
+            <button className="vcv-download-btn" disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+              <IconDownload /> Download Video CV
+            </button>
+          )}
         </div>
 
       </div>
