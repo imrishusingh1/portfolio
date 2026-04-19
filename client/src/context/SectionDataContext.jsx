@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react'
+import Loader from '../components/Loader'
 
 export const SectionDataCtx = createContext({})
 
@@ -15,6 +16,10 @@ export function SectionDataProvider({ children }) {
       .then(data => setSections(data))
       .catch(() => setSections({}))
   }, [])
+
+  if (sections === null) {
+    return <Loader />
+  }
 
   return (
     <SectionDataCtx.Provider value={{ sections, API }}>
