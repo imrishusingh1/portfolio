@@ -32,7 +32,13 @@ const resumeStorage = new CloudinaryStorage({
 
 const videoCvStorage = new CloudinaryStorage({
   cloudinary,
-  params: { folder: 'portfolio', public_id: 'video_cv', overwrite: true, resource_type: 'video' },
+  params: { 
+    folder: 'portfolio', 
+    public_id: 'video_cv', 
+    overwrite: true, 
+    resource_type: 'video',
+    chunk_size: 6000000 // Enable chunked uploads for large video files
+  },
 })
 
 const imageStorage = new CloudinaryStorage({

@@ -589,7 +589,11 @@ export default function AdminDashboard() {
             {videoUploadProgress > 0 && (
               <div style={{ marginTop: '20px' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: '#555', marginBottom: '8px' }}>
-                  <span>Uploading to Cloudinary...</span>
+                  <span>
+                    {videoUploadProgress === 100 
+                      ? 'Processing video with Cloudinary... (This may take a minute)' 
+                      : 'Uploading to server...'}
+                  </span>
                   <span>{videoUploadProgress}%</span>
                 </div>
                 <div className="admin-progress-bar">
