@@ -38,6 +38,7 @@ export default function AdminDashboard() {
   const fileRef = useRef(null)
   const profileRef = useRef(null)
   const videoRef = useRef(null)
+  const xhrRef = useRef(null)
 
   useEffect(() => {
     if (!authLoading && !isLoggedIn) navigate('/admin')
@@ -217,7 +218,8 @@ export default function AdminDashboard() {
     
     setVideoUploadProgress(1) // Start progress
     
-    const xhr = new XMLHttpRequest()
+    xhrRef.current = new XMLHttpRequest()
+    const xhr = xhrRef.current
     xhr.open('POST', `${API}/api/upload/video-cv`)
     xhr.setRequestHeader('Authorization', `Bearer ${token}`)
     
@@ -230,6 +232,7 @@ export default function AdminDashboard() {
     
     xhr.onload = () => {
       setVideoUploadProgress(0)
+      xhrRef.current = null
       if (xhr.status >= 200 && xhr.status < 300) {
         const response = JSON.parse(xhr.responseText)
         setVideoCvUrl(response.path)
@@ -241,10 +244,24 @@ export default function AdminDashboard() {
     
     xhr.onerror = () => {
       setVideoUploadProgress(0)
+      xhrRef.current = null
       showToast('Error uploading video')
+    }
+
+    xhr.onabort = () => {
+      setVideoUploadProgress(0)
+      xhrRef.current = null
+      showToast('Upload cancelled')
     }
     
     xhr.send(fd)
+  }
+
+  function cancelVideoCvUpload() {
+    if (xhrRef.current) {
+      xhrRef.current.abort()
+      if (videoRef.current) videoRef.current.value = ''
+    }
   }
 
   async function deleteVideoCv() {
@@ -578,6 +595,13 @@ export default function AdminDashboard() {
                 <div className="admin-progress-bar">
                   <div className="admin-progress-fill" style={{ width: `${videoUploadProgress}%` }} />
                 </div>
+                <button 
+                  onClick={cancelVideoCvUpload}
+                  className="admin-save-btn" 
+                  style={{ background: '#dc2626', padding: '6px 12px', fontSize: '12px', marginTop: '12px' }}
+                >
+                  ✕ Cancel Upload
+                </button>
               </div>
             )}
 
