@@ -204,7 +204,7 @@ export default function AdminDashboard() {
     }
   }
 
-  function handleVideoCvUpload(e) {
+  async function handleVideoCvUpload(e) {
     const file = e.target.files[0]
     if (!file) return
     
@@ -213,55 +213,82 @@ export default function AdminDashboard() {
       return
     }
 
-    const fd = new FormData()
-    fd.append('video', file)
-    
-    setVideoUploadProgress(1) // Start progress
-    
-    xhrRef.current = new XMLHttpRequest()
-    const xhr = xhrRef.current
-    xhr.open('POST', `${API}/api/upload/video-cv`)
-    xhr.setRequestHeader('Authorization', `Bearer ${token}`)
-    
-    xhr.upload.onprogress = (event) => {
-      if (event.lengthComputable) {
-        const percent = Math.round((event.loaded / event.total) * 100)
-        setVideoUploadProgress(Math.max(1, percent))
-      }
-    }
-    
-    xhr.onload = () => {
-      setVideoUploadProgress(0)
-      xhrRef.current = null
-      if (xhr.status >= 200 && xhr.status < 300) {
-        const response = JSON.parse(xhr.responseText)
-        setVideoCvUrl(response.path)
-        showToast('Video CV uploaded successfully!')
-      } else {
-        let errMsg = 'Video upload failed'
-        try {
-          const errBody = JSON.parse(xhr.responseText)
-          if (errBody.error) errMsg = errBody.error
-          if (errBody.details) errMsg += ': ' + errBody.details
-        } catch {}
-        showToast(errMsg)
-        console.error('Upload error response:', xhr.responseText)
-      }
-    }
-    
-    xhr.onerror = () => {
-      setVideoUploadProgress(0)
-      xhrRef.current = null
-      showToast('Error uploading video')
-    }
+    setVideoUploadProgress(1)
 
-    xhr.onabort = () => {
+    try {
+      // Step 1: Get signed upload token from our server
+      const sigRes = await fetch(`${API}/api/upload/video-cv-signature`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      if (!sigRes.ok) { showToast('Failed to start upload'); setVideoUploadProgress(0); return }
+      const sig = await sigRes.json()
+
+      // Step 2: Upload directly to Cloudinary (bypasses Vercel 4.5MB limit)
+      const fd = new FormData()
+      fd.append('file', file)
+      fd.append('api_key', sig.api_key)
+      fd.append('timestamp', sig.timestamp)
+      fd.append('signature', sig.signature)
+      fd.append('folder', sig.folder)
+      fd.append('public_id', sig.public_id)
+      fd.append('overwrite', 'true')
+
+      xhrRef.current = new XMLHttpRequest()
+      const xhr = xhrRef.current
+      xhr.open('POST', `https://api.cloudinary.com/v1_1/${sig.cloud_name}/video/upload`)
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const percent = Math.round((event.loaded / event.total) * 100)
+          setVideoUploadProgress(Math.max(1, percent))
+        }
+      }
+
+      xhr.onload = async () => {
+        xhrRef.current = null
+        if (xhr.status >= 200 && xhr.status < 300) {
+          const result = JSON.parse(xhr.responseText)
+          const url = result.secure_url
+          // Step 3: Save the Cloudinary URL to our database
+          const confirmRes = await fetch(`${API}/api/upload/video-cv-confirm`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+            body: JSON.stringify({ url })
+          })
+          setVideoUploadProgress(0)
+          if (confirmRes.ok) {
+            setVideoCvUrl(url)
+            showToast('Video CV uploaded successfully!')
+          } else {
+            showToast('Upload succeeded but failed to save URL')
+          }
+        } else {
+          setVideoUploadProgress(0)
+          let errMsg = 'Video upload failed'
+          try { const e = JSON.parse(xhr.responseText); if (e.error?.message) errMsg = e.error.message } catch {}
+          showToast(errMsg)
+          console.error('Cloudinary upload error:', xhr.responseText)
+        }
+      }
+
+      xhr.onerror = () => {
+        setVideoUploadProgress(0)
+        xhrRef.current = null
+        showToast('Error uploading video')
+      }
+
+      xhr.onabort = () => {
+        setVideoUploadProgress(0)
+        xhrRef.current = null
+        showToast('Upload cancelled')
+      }
+
+      xhr.send(fd)
+    } catch (err) {
       setVideoUploadProgress(0)
-      xhrRef.current = null
-      showToast('Upload cancelled')
+      showToast('Upload failed: ' + err.message)
+      console.error(err)
     }
-    
-    xhr.send(fd)
   }
 
   function cancelVideoCvUpload() {

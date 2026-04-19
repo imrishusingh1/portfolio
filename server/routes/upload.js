@@ -4,9 +4,6 @@ import { v2 as cloudinary } from 'cloudinary'
 import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import auth from '../middleware/auth.js'
 import Setting from '../models/Setting.js'
-import os from 'os'
-import fs from 'fs'
-import path from 'path'
 
 const router = Router()
 
@@ -42,17 +39,10 @@ const imageStorage = new CloudinaryStorage({
   }),
 })
 
-// Video CV: use temp disk storage, then upload to Cloudinary manually
-const videoTempStorage = multer.diskStorage({
-  destination: os.tmpdir(),
-  filename: (req, file, cb) => cb(null, `video_cv_${Date.now()}${path.extname(file.originalname)}`)
-})
-
 const uploadProfile = multer({ storage: profileStorage, limits: { fileSize: 10 * 1024 * 1024 } })
 const uploadLogo    = multer({ storage: logoStorage,    limits: { fileSize: 10 * 1024 * 1024 } })
 const uploadResume  = multer({ storage: resumeStorage,  limits: { fileSize: 10 * 1024 * 1024 } })
 const uploadImage   = multer({ storage: imageStorage,   limits: { fileSize: 10 * 1024 * 1024 } })
-const uploadVideoCvTemp = multer({ storage: videoTempStorage })
 
 // ── Profile Picture ──────────────────────────────────────────────
 router.post('/profile', auth, uploadProfile.single('image'), async (req, res) => {
@@ -136,35 +126,33 @@ router.get('/download-resume', async (req, res) => {
 })
 
 // ── Video CV ─────────────────────────────────────────────────────
-router.post('/video-cv', auth, uploadVideoCvTemp.single('video'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No video file uploaded' })
-  
-  try {
-    console.log('Video CV upload: file received, size:', (req.file.size / (1024 * 1024)).toFixed(1), 'MB')
-    
-    // Upload to Cloudinary directly using the SDK (reliable for videos)
-    const result = await cloudinary.uploader.upload(req.file.path, {
-      folder: 'portfolio',
-      public_id: 'video_cv',
-      overwrite: true,
-      resource_type: 'video',
-      chunk_size: 6000000,
-    })
-    
-    // Clean up temp file
-    fs.unlink(req.file.path, () => {})
-    
-    const url = result.secure_url
-    console.log('Video CV uploaded to Cloudinary:', url)
-    
-    await Setting.findOneAndUpdate({ key: 'video_cv_url' }, { value: url }, { upsert: true, new: true })
-    res.json({ success: true, path: url })
-  } catch (err) {
-    // Clean up temp file on error
-    if (req.file?.path) fs.unlink(req.file.path, () => {})
-    console.error('Video CV upload error:', err)
-    res.status(500).json({ error: 'Failed to upload video to Cloudinary', details: err.message })
+
+// Step 1: Get a signed upload signature (browser will upload directly to Cloudinary)
+router.get('/video-cv-signature', auth, (req, res) => {
+  const timestamp = Math.round(Date.now() / 1000)
+  const params = {
+    folder: 'portfolio',
+    public_id: 'video_cv',
+    overwrite: 'true',
+    timestamp,
   }
+  const signature = cloudinary.utils.api_sign_request(params, process.env.CLOUDINARY_API_SECRET)
+  res.json({
+    signature,
+    timestamp,
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    folder: 'portfolio',
+    public_id: 'video_cv',
+  })
+})
+
+// Step 2: After browser uploads to Cloudinary, save the URL
+router.post('/video-cv-confirm', auth, async (req, res) => {
+  const { url } = req.body
+  if (!url) return res.status(400).json({ error: 'No URL provided' })
+  await Setting.findOneAndUpdate({ key: 'video_cv_url' }, { value: url }, { upsert: true, new: true })
+  res.json({ success: true })
 })
 
 router.delete('/video-cv', auth, async (req, res) => {
