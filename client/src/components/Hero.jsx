@@ -48,9 +48,6 @@ export default function Hero() {
             a{' '}
             <span className="wavy-word">
               {subhead}
-              <svg className="wavy-svg" viewBox="0 0 260 20" fill="none" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-                <path d="M 5,6 Q 120,3 235,5 L 90,13 Q 180,15 250,15" stroke="#908aee" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
-              </svg>
             </span>
           </h1>
           <p className="hero-sub">

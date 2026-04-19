@@ -72,17 +72,14 @@
 /* Wavy underline word wrapper */
 .wavy-word {
   position: relative;
-  display: inline-block;
+  display: inline;
   white-space: normal; /* Allow wrapping on very small screens */
   word-break: break-word;
-}
-.wavy-svg {
-  position: absolute;
-  bottom: -10px;
-  left: 0;
-  width: 100%;
-  height: 20px;
-  pointer-events: none;
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-decoration-color: #908aee;
+  text-decoration-thickness: 3px;
+  text-underline-offset: 8px;
 }
 .hero-sub {
   font-size: 16px;
@@ -186,7 +183,6 @@
   .hero-arch-container { width: clamp(280px, 80vw, 360px); height: clamp(340px, 90vw, 420px); margin: 0 auto; }
   .rotating-badge-wrap { left: -10px; top: -15px; transform: scale(0.65); }
   .hero-wind { right: -20px; bottom: 40px; transform: scale(0.8); }
-  .wavy-svg { height: 14px; bottom: -6px; }
 }
 
 @media (max-width: 480px) {
