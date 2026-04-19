@@ -226,22 +226,44 @@
   .exp-inner { grid-template-columns: 1fr; }
   .exp-left { position: static; }
   .timeline-item {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    padding-bottom: 28px;
+    grid-template-columns: 32px 1fr;
+    grid-template-rows: auto auto;
+    gap: 0 12px;
+    padding-bottom: 40px;
   }
-  .timeline-period { text-align: left; font-size: 12px; }
+  .timeline-period { 
+    grid-column: 2;
+    grid-row: 1;
+    text-align: left; 
+    font-size: 12px; 
+    margin-bottom: 4px;
+    padding-top: 0;
+  }
   .timeline-divider {
+    grid-column: 1;
+    grid-row: 1 / span 2;
     min-height: 10px;
-    align-items: flex-start;
+    align-items: center; /* Center dot horizontally */
+    position: relative;
+    margin-top: 2px;
   }
-  .timeline-divider::after { display: none; }
-  .timeline-content { padding-left: 0; }
+  .timeline-divider::after { 
+    display: block; 
+    top: 20px;
+    bottom: -40px;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .timeline-content { 
+    grid-column: 2;
+    grid-row: 2;
+    padding-left: 0; 
+  }
 }
 
 @media (max-width: 480px) {
   .about-section { padding: 72px 0; }
-  .experience-section { padding-bottom: 120px; }
+  .experience-section { padding-bottom: 220px; } /* Increased from 120px to prevent the Testimonials card from overlapping */
   .about-text p { font-size: 15px; }
   .timeline-role { font-size: 18px; }
 }
