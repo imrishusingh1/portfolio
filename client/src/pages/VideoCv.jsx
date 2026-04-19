@@ -55,7 +55,7 @@ const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2]
 //  VIDEO CV PAGE
 // ══════════════════════════════════════════════════════════
 export default function VideoCv() {
-  const API = import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  const API = import.meta.env.VITE_API_URL || ''
   const [videoSrc, setVideoSrc] = useState(null)
   const [loading, setLoading] = useState(true)
 
