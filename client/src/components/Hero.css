@@ -193,6 +193,6 @@
   .hero-hello-large { font-size: 40px; gap: 8px; }
   .hero-headline { font-size: clamp(18px, 6vw, 24px); } /* Fits "Full-Stack Web Developer" on 1 line reliably */
   .hero-arch-container { width: 100%; max-width: 300px; height: 320px; }
-  .hero-btns { width: 100%; justify-content: center; flex-direction: column; }
-  .hero-btn { width: 100%; }
+  .hero-btns { width: 100%; align-items: center; flex-direction: column; gap: 12px; }
+  .hero-btn { width: 100%; margin: 0; }
 }
