@@ -57,7 +57,7 @@ export default function Hero() {
             {description.split('\n').map((line, i) => <span key={i}>{line}{i < description.split('\n').length - 1 && <br />}</span>)}
           </p>
           <div className="hero-btns">
-            <Link to="portfolio" smooth offset={-80} duration={600}>
+            <Link className="hero-btn-link" to="portfolio" smooth offset={-80} duration={600}>
               <button className="btn btn-outline hero-btn">{btnText}</button>
             </Link>
             <a href={`${API}/api/upload/download-resume`} download className="btn btn-outline hero-btn">Download Resume ↓</a>
