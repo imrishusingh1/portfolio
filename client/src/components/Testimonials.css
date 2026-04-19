@@ -186,3 +186,27 @@
   object-fit: cover;
   margin-bottom: 8px;
 }
+
+@media (max-width: 768px) {
+  .testimonials-wrap {
+    transform: none;
+    margin-top: -100px; /* Use a fixed overlap amount instead of -50% of its dynamic height */
+    margin-bottom: 0px;
+  }
+  .testimonials-inner {
+    padding: 48px 32px;
+  }
+  .nav-btn {
+    width: 38px; height: 38px;
+  }
+  .nav-prev { left: 16px; }
+  .nav-next { right: 16px; }
+}
+
+@media (max-width: 480px) {
+  .testimonials-inner {
+    padding: 40px 24px;
+  }
+  .nav-prev { left: 8px; }
+  .nav-next { right: 8px; }
+}
