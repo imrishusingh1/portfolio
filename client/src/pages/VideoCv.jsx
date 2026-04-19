@@ -303,8 +303,8 @@ export default function VideoCv() {
               </div>
             ) : !videoSrc ? (
               <div style={{ padding: '80px 20px', textAlign: 'center', color: '#555', fontFamily: 'var(--font-head)' }}>
-                <h3>No Video CV Available Yet</h3>
-                <p style={{ marginTop: '10px', fontSize: '14px' }}>The video resume will be displayed here once uploaded from the admin dashboard.</p>
+                <h3>Video CV Coming Soon</h3>
+                <p style={{ marginTop: '10px', fontSize: '14px' }}>A brief video presentation of my skills, projects, and professional background will be available here shortly.</p>
               </div>
             ) : (
               <div
