@@ -73,7 +73,8 @@
 .wavy-word {
   position: relative;
   display: inline-block;
-  white-space: nowrap;
+  white-space: normal; /* Allow wrapping on very small screens */
+  word-break: break-word;
 }
 .wavy-svg {
   position: absolute;
@@ -128,14 +129,14 @@
 .rotating-badge-wrap {
   position: absolute;
   top: 10px;
-  left: -50px;
+  left: -40px;
   transform: none;
   z-index: 2;
   cursor: pointer;
 }
 .rotating-badge {
   position: relative;
-  width: 140px; height: 140px;
+  width: 130px; height: 130px;
   background: #e6f0fa; /* Light blue accent */
   border-radius: 50%;
   border: var(--border);
@@ -173,27 +174,26 @@
   z-index: 1;
 }
 
-@media (max-width: 768px) {
-  .hero-inner { grid-template-columns: 1fr; text-align: center; }
+@media (max-width: 1200px) {
+  /* Break to 1 column slightly earlier to avoid overlapping the badge */
+  .hero-inner { grid-template-columns: 1fr; text-align: center; gap: 48px; }
   .hero-text { align-items: center; }
-  .hero-photo-wrap { justify-content: center; }
-  .hero-arch-container { width: 320px; height: 380px; margin: 0 auto; }
-  .rotating-badge-wrap { left: -30px; top: -10px; transform: scale(0.75); }
-  .hero-wind { right: -30px; bottom: 40px; transform: scale(0.8); }
-  .wavy-svg { height: 14px; bottom: -6px; }
-}
-
-@media (max-width: 1024px) {
-  .hero-inner { grid-template-columns: 1fr; text-align: center; }
-  .hero-text { align-items: center; }
-  .hero-sub { max-width: 640px; }
+  .hero-sub { max-width: 640px; margin: 0 auto; }
   .hero-photo-wrap { justify-content: center; padding-top: 12px; }
 }
 
+@media (max-width: 768px) {
+  .hero-arch-container { width: clamp(280px, 80vw, 360px); height: clamp(340px, 90vw, 420px); margin: 0 auto; }
+  .rotating-badge-wrap { left: -10px; top: -15px; transform: scale(0.65); }
+  .hero-wind { right: -20px; bottom: 40px; transform: scale(0.8); }
+  .wavy-svg { height: 14px; bottom: -6px; }
+}
+
 @media (max-width: 480px) {
-  .hero { min-height: auto; }
-  .hero-hello-large { font-size: 56px; gap: 10px; }
-  .hero-headline { font-size: clamp(30px, 10vw, 42px); }
-  .hero-arch-container { width: 270px; height: 320px; }
-  .hero-btns { width: 100%; justify-content: center; }
+  .hero { min-height: auto; padding-top: 40px; }
+  .hero-hello-large { font-size: 48px; gap: 10px; }
+  .hero-headline { font-size: clamp(28px, 9vw, 36px); }
+  .hero-arch-container { width: 100%; max-width: 320px; height: 340px; }
+  .hero-btns { width: 100%; justify-content: center; flex-direction: column; }
+  .hero-btn { width: 100%; }
 }
