@@ -48,7 +48,7 @@ const uploadProfile = multer({ storage: profileStorage, limits: { fileSize: 10 *
 const uploadLogo    = multer({ storage: logoStorage,    limits: { fileSize: 10 * 1024 * 1024 } })
 const uploadResume  = multer({ storage: resumeStorage,  limits: { fileSize: 10 * 1024 * 1024 } })
 const uploadImage   = multer({ storage: imageStorage,   limits: { fileSize: 10 * 1024 * 1024 } })
-const uploadVideoCv = multer({ storage: videoCvStorage, limits: { fileSize: 100 * 1024 * 1024 } }) // 100MB limit
+const uploadVideoCv = multer({ storage: videoCvStorage }) // No file size limit for video
 
 // ── Profile Picture ──────────────────────────────────────────────
 router.post('/profile', auth, uploadProfile.single('image'), async (req, res) => {
@@ -137,6 +137,11 @@ router.post('/video-cv', auth, uploadVideoCv.single('video'), async (req, res) =
   const url = req.file.path
   await Setting.findOneAndUpdate({ key: 'video_cv_url' }, { value: url }, { upsert: true, new: true })
   res.json({ success: true, path: url })
+})
+
+router.delete('/video-cv', auth, async (req, res) => {
+  await Setting.findOneAndUpdate({ key: 'video_cv_url' }, { value: null }, { upsert: true, new: true })
+  res.json({ success: true })
 })
 
 router.get('/video-cv-url', async (req, res) => {

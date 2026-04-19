@@ -247,6 +247,24 @@ export default function AdminDashboard() {
     xhr.send(fd)
   }
 
+  async function deleteVideoCv() {
+    if (!confirm('Are you sure you want to delete your Video CV?')) return;
+    try {
+      const res = await fetch(`${API}/api/upload/video-cv`, {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (res.ok) {
+        setVideoCvUrl(null);
+        showToast('Video CV deleted successfully');
+      } else {
+        showToast('Failed to delete Video CV');
+      }
+    } catch (e) {
+      showToast('Error deleting Video CV');
+    }
+  }
+
   const currentSection = sections.find(s => s.sectionKey === activeTab)
 
   if (authLoading) return <div className="admin-dash-loading">Loading...</div>
@@ -545,7 +563,7 @@ export default function AdminDashboard() {
         {activeTab === 'video_cv' && (
           <div className="admin-panel">
             <h2>🎥 Upload Video CV</h2>
-            <p>Upload your video resume. It will be displayed on the /vcv page. (Max 100MB)</p>
+            <p>Upload your video resume. It will be displayed on the /vcv page.</p>
             <input type="file" accept="video/*" ref={videoRef} onChange={handleVideoCvUpload} style={{ display: 'none' }} />
             <button className="admin-upload-btn" onClick={() => videoRef.current?.click()} disabled={videoUploadProgress > 0}>
               {videoUploadProgress > 0 ? 'Uploading...' : 'Choose Video File'}
@@ -573,9 +591,18 @@ export default function AdminDashboard() {
                     style={{ width: '100%', height: '100%', display: 'block' }}
                   />
                 </div>
-                <p style={{ marginTop: 8, fontSize: 13, color: '#666' }}>
-                  Make sure it looks good! You can always upload a new one.
-                </p>
+                <div style={{ marginTop: 12, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <p style={{ fontSize: 13, color: '#666', margin: 0 }}>
+                    Make sure it looks good! You can upload a new one at any time.
+                  </p>
+                  <button 
+                    onClick={deleteVideoCv}
+                    className="admin-save-btn" 
+                    style={{ background: '#dc2626', padding: '8px 16px', fontSize: '13px' }}
+                  >
+                    🗑️ Delete Video
+                  </button>
+                </div>
               </div>
             )}
           </div>
