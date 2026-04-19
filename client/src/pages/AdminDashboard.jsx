@@ -238,7 +238,14 @@ export default function AdminDashboard() {
         setVideoCvUrl(response.path)
         showToast('Video CV uploaded successfully!')
       } else {
-        showToast('Video upload failed')
+        let errMsg = 'Video upload failed'
+        try {
+          const errBody = JSON.parse(xhr.responseText)
+          if (errBody.error) errMsg = errBody.error
+          if (errBody.details) errMsg += ': ' + errBody.details
+        } catch {}
+        showToast(errMsg)
+        console.error('Upload error response:', xhr.responseText)
       }
     }
     
