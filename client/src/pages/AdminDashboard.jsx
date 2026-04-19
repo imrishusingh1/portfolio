@@ -32,14 +32,23 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState('hero')
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
+  const [videoUploadProgress, setVideoUploadProgress] = useState(0)
+  const [videoCvUrl, setVideoCvUrl] = useState(null)
+  
   const fileRef = useRef(null)
   const profileRef = useRef(null)
+  const videoRef = useRef(null)
 
   useEffect(() => {
     if (!authLoading && !isLoggedIn) navigate('/admin')
   }, [authLoading, isLoggedIn])
 
-  useEffect(() => { if (token) fetchSections() }, [token])
+  useEffect(() => { 
+    if (token) {
+      fetchSections()
+      fetchVideoCvUrl()
+    }
+  }, [token])
 
   async function fetchSections() {
     const res = await fetch(`${API}/api/sections/admin/all`, {
@@ -68,6 +77,18 @@ export default function AdminDashboard() {
       headers: { Authorization: `Bearer ${token}` }
     })
     if (res.ok) setVisitors(await res.json())
+  }
+
+  async function fetchVideoCvUrl() {
+    try {
+      const res = await fetch(`${API}/api/upload/video-cv-url`)
+      if (res.ok) {
+        const data = await res.json()
+        setVideoCvUrl(data.url)
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
 
   async function fetchNotifySetting() {
@@ -182,6 +203,50 @@ export default function AdminDashboard() {
     }
   }
 
+  function handleVideoCvUpload(e) {
+    const file = e.target.files[0]
+    if (!file) return
+    
+    if (!file.type.startsWith('video/')) {
+      showToast('Please select a valid video file')
+      return
+    }
+
+    const fd = new FormData()
+    fd.append('video', file)
+    
+    setVideoUploadProgress(1) // Start progress
+    
+    const xhr = new XMLHttpRequest()
+    xhr.open('POST', `${API}/api/upload/video-cv`)
+    xhr.setRequestHeader('Authorization', `Bearer ${token}`)
+    
+    xhr.upload.onprogress = (event) => {
+      if (event.lengthComputable) {
+        const percent = Math.round((event.loaded / event.total) * 100)
+        setVideoUploadProgress(Math.max(1, percent))
+      }
+    }
+    
+    xhr.onload = () => {
+      setVideoUploadProgress(0)
+      if (xhr.status >= 200 && xhr.status < 300) {
+        const response = JSON.parse(xhr.responseText)
+        setVideoCvUrl(response.path)
+        showToast('Video CV uploaded successfully!')
+      } else {
+        showToast('Video upload failed')
+      }
+    }
+    
+    xhr.onerror = () => {
+      setVideoUploadProgress(0)
+      showToast('Error uploading video')
+    }
+    
+    xhr.send(fd)
+  }
+
   const currentSection = sections.find(s => s.sectionKey === activeTab)
 
   if (authLoading) return <div className="admin-dash-loading">Loading...</div>
@@ -236,6 +301,12 @@ export default function AdminDashboard() {
             🖼️ Profile Photo
           </button>
           <button
+            className={`admin-nav-btn ${activeTab === 'video_cv' ? 'active' : ''}`}
+            onClick={() => setActiveTab('video_cv')}
+          >
+            🎥 Video CV
+          </button>
+          <button
             className={`admin-nav-btn ${activeTab === 'visitors' ? 'active' : ''}`}
             onClick={() => { setActiveTab('visitors'); fetchVisitors(); fetchNotifySetting() }}
           >
@@ -252,7 +323,7 @@ export default function AdminDashboard() {
         {toast && <div className="admin-toast">{toast}</div>}
 
         {/* Section editor */}
-        {activeTab !== 'messages' && activeTab !== 'resume' && activeTab !== 'profile' && activeTab !== 'reviews' && activeTab !== 'visitors' && currentSection && (
+        {activeTab !== 'messages' && activeTab !== 'resume' && activeTab !== 'profile' && activeTab !== 'video_cv' && activeTab !== 'reviews' && activeTab !== 'visitors' && currentSection && (
           <SectionEditor
             section={currentSection}
             onSave={saveSection}
@@ -466,6 +537,46 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </>
+            )}
+          </div>
+        )}
+
+        {/* Video CV upload */}
+        {activeTab === 'video_cv' && (
+          <div className="admin-panel">
+            <h2>🎥 Upload Video CV</h2>
+            <p>Upload your video resume. It will be displayed on the /vcv page. (Max 100MB)</p>
+            <input type="file" accept="video/*" ref={videoRef} onChange={handleVideoCvUpload} style={{ display: 'none' }} />
+            <button className="admin-upload-btn" onClick={() => videoRef.current?.click()} disabled={videoUploadProgress > 0}>
+              {videoUploadProgress > 0 ? 'Uploading...' : 'Choose Video File'}
+            </button>
+            
+            {videoUploadProgress > 0 && (
+              <div style={{ marginTop: '20px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '13px', fontWeight: 600, color: '#555', marginBottom: '8px' }}>
+                  <span>Uploading to Cloudinary...</span>
+                  <span>{videoUploadProgress}%</span>
+                </div>
+                <div className="admin-progress-bar">
+                  <div className="admin-progress-fill" style={{ width: `${videoUploadProgress}%` }} />
+                </div>
+              </div>
+            )}
+
+            {videoCvUrl && videoUploadProgress === 0 && (
+              <div style={{ marginTop: 32 }}>
+                <h3 style={{ fontSize: '16px', marginBottom: '12px' }}>Current Video Preview</h3>
+                <div style={{ borderRadius: '14px', overflow: 'hidden', border: '2px solid #1d1d1d', background: '#000', maxWidth: '600px', aspectRatio: '16/9' }}>
+                  <video 
+                    src={videoCvUrl} 
+                    controls 
+                    style={{ width: '100%', height: '100%', display: 'block' }}
+                  />
+                </div>
+                <p style={{ marginTop: 8, fontSize: 13, color: '#666' }}>
+                  Make sure it looks good! You can always upload a new one.
+                </p>
+              </div>
             )}
           </div>
         )}

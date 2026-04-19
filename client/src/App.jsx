@@ -23,6 +23,7 @@ import Footer from './components/Footer'
 
 import AdminLogin from './pages/AdminLogin'
 import AdminDashboard from './pages/AdminDashboard'
+import VideoCv from './pages/VideoCv'
 import useSessionTracker from './hooks/useSessionTracker'
 
 // ── Visitor tracking ──────────────────────────────────────────────
@@ -85,6 +86,7 @@ function App() {
         <Routes>
           <Route path="/admin" element={<AdminLogin />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
+          <Route path="/vcv" element={<VideoCv />} />
           <Route path="*" element={<PublicSite />} />
         </Routes>
       </AuthProvider>

@@ -7,7 +7,7 @@ import { fileURLToPath } from 'url'
 import helmet from 'helmet'
 import rateLimit from 'express-rate-limit'
 import slowDown from 'express-slow-down'
-import UAParser from 'ua-parser-js'
+import { UAParser } from 'ua-parser-js'
 
 import authRoutes from './routes/auth.js'
 import sectionRoutes from './routes/sections.js'

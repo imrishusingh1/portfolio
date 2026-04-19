@@ -30,6 +30,11 @@ const resumeStorage = new CloudinaryStorage({
   params: { folder: 'portfolio', public_id: 'resume', overwrite: true, resource_type: 'raw', format: 'pdf' },
 })
 
+const videoCvStorage = new CloudinaryStorage({
+  cloudinary,
+  params: { folder: 'portfolio', public_id: 'video_cv', overwrite: true, resource_type: 'video' },
+})
+
 const imageStorage = new CloudinaryStorage({
   cloudinary,
   params: (req, file) => ({
@@ -43,6 +48,7 @@ const uploadProfile = multer({ storage: profileStorage, limits: { fileSize: 10 *
 const uploadLogo    = multer({ storage: logoStorage,    limits: { fileSize: 10 * 1024 * 1024 } })
 const uploadResume  = multer({ storage: resumeStorage,  limits: { fileSize: 10 * 1024 * 1024 } })
 const uploadImage   = multer({ storage: imageStorage,   limits: { fileSize: 10 * 1024 * 1024 } })
+const uploadVideoCv = multer({ storage: videoCvStorage, limits: { fileSize: 100 * 1024 * 1024 } }) // 100MB limit
 
 // ── Profile Picture ──────────────────────────────────────────────
 router.post('/profile', auth, uploadProfile.single('image'), async (req, res) => {
@@ -122,6 +128,23 @@ router.get('/download-resume', async (req, res) => {
   } catch (err) {
     console.error('Resume download error:', err)
     res.status(500).send('Download error')
+  }
+})
+
+// ── Video CV ─────────────────────────────────────────────────────
+router.post('/video-cv', auth, uploadVideoCv.single('video'), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No video file uploaded' })
+  const url = req.file.path
+  await Setting.findOneAndUpdate({ key: 'video_cv_url' }, { value: url }, { upsert: true, new: true })
+  res.json({ success: true, path: url })
+})
+
+router.get('/video-cv-url', async (req, res) => {
+  try {
+    const s = await Setting.findOne({ key: 'video_cv_url' })
+    res.json({ url: s?.value || null })
+  } catch {
+    res.json({ url: null })
   }
 })
 
