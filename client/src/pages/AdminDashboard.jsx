@@ -213,11 +213,6 @@ export default function AdminDashboard() {
       return
     }
 
-    if (file.size > 104857600) {
-      showToast('Video exceeds 100MB limit. Please compress it before uploading.')
-      return
-    }
-
     setVideoUploadProgress(1)
 
     try {
