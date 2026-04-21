@@ -38,10 +38,13 @@ export default function Navbar() {
   })
 
   useEffect(() => {
-    const h = () => setScrolled(window.scrollY > 10)
-    window.addEventListener('scroll', h)
+    const h = () => {
+      setScrolled(window.scrollY > 10)
+      if (open) setOpen(false) // Auto-close menu when user scrolls
+    }
+    window.addEventListener('scroll', h, { passive: true })
     return () => window.removeEventListener('scroll', h)
-  }, [])
+  }, [open])
 
   return (
     <header className="header-wrapper">

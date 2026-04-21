@@ -128,11 +128,11 @@
   }
 
   .nav-links {
-    position: fixed;
-    top: 76px;
+    position: absolute; /* Follows the parent navbar rather than window */
+    top: 100%; /* Drop perfectly from the bottom edge, eliminating empty gaps */
     left: -100%;
     width: 100%;
-    max-height: calc(100vh - 76px);
+    max-height: 85vh; /* Safe alternative to calc based on fixed pixels */
     overflow-y: auto;
     background: #fff;
     flex-direction: column;
