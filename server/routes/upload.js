@@ -1,7 +1,5 @@
 import { Router } from 'express'
-import multer from 'multer'
 import { v2 as cloudinary } from 'cloudinary'
-import { CloudinaryStorage } from 'multer-storage-cloudinary'
 import auth from '../middleware/auth.js'
 import Setting from '../models/Setting.js'
 
@@ -14,42 +12,31 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 })
 
-// ── Cloudinary Storages ──────────────────────────────────────────
-const profileStorage = new CloudinaryStorage({
-  cloudinary,
-  params: { folder: 'portfolio', public_id: 'profile', overwrite: true, resource_type: 'image' },
-})
+// ── Helper: upload a base64 data URI to Cloudinary ───────────────
+async function uploadBase64(dataUri, options) {
+  return new Promise((resolve, reject) => {
+    cloudinary.uploader.upload(dataUri, options, (err, result) => {
+      if (err) reject(err)
+      else resolve(result)
+    })
+  })
+}
 
-const logoStorage = new CloudinaryStorage({
-  cloudinary,
-  params: { folder: 'portfolio', public_id: 'logo', overwrite: true, resource_type: 'image' },
-})
-
-const resumeStorage = new CloudinaryStorage({
-  cloudinary,
-  params: { folder: 'portfolio', public_id: 'resume', overwrite: true, resource_type: 'raw', format: 'pdf' },
-})
-
-const imageStorage = new CloudinaryStorage({
-  cloudinary,
-  params: (req, file) => ({
-    folder: 'portfolio/images',
-    resource_type: 'image',
-    public_id: `img-${Date.now()}`,
-  }),
-})
-
-const uploadProfile = multer({ storage: profileStorage, limits: { fileSize: 10 * 1024 * 1024 } })
-const uploadLogo    = multer({ storage: logoStorage,    limits: { fileSize: 10 * 1024 * 1024 } })
-const uploadResume  = multer({ storage: resumeStorage,  limits: { fileSize: 10 * 1024 * 1024 } })
-const uploadImage   = multer({ storage: imageStorage,   limits: { fileSize: 10 * 1024 * 1024 } })
-
-// ── Profile Picture ──────────────────────────────────────────────
-router.post('/profile', auth, uploadProfile.single('image'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  const url = req.file.path
-  await Setting.findOneAndUpdate({ key: 'profile_pic_url' }, { value: url }, { upsert: true, new: true })
-  res.json({ success: true, path: url })
+// ── Profile Picture (base64 JSON) ────────────────────────────────
+router.post('/profile', auth, async (req, res) => {
+  try {
+    const { data } = req.body   // data = "data:image/...;base64,..."
+    if (!data) return res.status(400).json({ error: 'No file data provided' })
+    const result = await uploadBase64(data, {
+      folder: 'portfolio', public_id: 'profile', overwrite: true, resource_type: 'image',
+    })
+    const url = result.secure_url
+    await Setting.findOneAndUpdate({ key: 'profile_pic_url' }, { value: url }, { upsert: true, new: true })
+    res.json({ success: true, path: url })
+  } catch (err) {
+    console.error('Profile upload error:', err)
+    res.status(500).json({ error: err.message || 'Upload failed' })
+  }
 })
 
 router.get('/profile-pic', async (req, res) => {
@@ -60,12 +47,21 @@ router.get('/profile-pic', async (req, res) => {
   } catch { res.status(404).send('Not found') }
 })
 
-// ── Site Logo ────────────────────────────────────────────────────
-router.post('/logo', auth, uploadLogo.single('image'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  const url = req.file.path
-  await Setting.findOneAndUpdate({ key: 'logo_url' }, { value: url }, { upsert: true, new: true })
-  res.json({ success: true, path: url })
+// ── Site Logo (base64 JSON) ───────────────────────────────────────
+router.post('/logo', auth, async (req, res) => {
+  try {
+    const { data } = req.body
+    if (!data) return res.status(400).json({ error: 'No file data provided' })
+    const result = await uploadBase64(data, {
+      folder: 'portfolio', public_id: 'logo', overwrite: true, resource_type: 'image',
+    })
+    const url = result.secure_url
+    await Setting.findOneAndUpdate({ key: 'logo_url' }, { value: url }, { upsert: true, new: true })
+    res.json({ success: true, path: url })
+  } catch (err) {
+    console.error('Logo upload error:', err)
+    res.status(500).json({ error: err.message || 'Upload failed' })
+  }
 })
 
 router.get('/logo-pic', async (req, res) => {
@@ -76,12 +72,26 @@ router.get('/logo-pic', async (req, res) => {
   } catch { res.status(404).send('Not found') }
 })
 
-// ── Resume (PDF) ─────────────────────────────────────────────────
-router.post('/resume', auth, uploadResume.single('resume'), async (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  const url = req.file.path
-  await Setting.findOneAndUpdate({ key: 'resume_url' }, { value: url }, { upsert: true, new: true })
-  res.json({ success: true, path: url })
+// ── Resume PDF (base64 JSON) ──────────────────────────────────────
+// Vercel serverless can't handle multer multipart — we accept base64 instead.
+router.post('/resume', auth, async (req, res) => {
+  try {
+    const { data } = req.body   // data = "data:application/pdf;base64,..."
+    if (!data) return res.status(400).json({ error: 'No file data provided' })
+    const result = await uploadBase64(data, {
+      folder: 'portfolio',
+      public_id: 'resume',
+      overwrite: true,
+      resource_type: 'raw',
+      format: 'pdf',
+    })
+    const url = result.secure_url
+    await Setting.findOneAndUpdate({ key: 'resume_url' }, { value: url }, { upsert: true, new: true })
+    res.json({ success: true, path: url })
+  } catch (err) {
+    console.error('Resume upload error:', err)
+    res.status(500).json({ error: err.message || 'Upload failed' })
+  }
 })
 
 router.get('/resume/status', async (req, res) => {
@@ -169,10 +179,21 @@ router.get('/video-cv-url', async (req, res) => {
   }
 })
 
-// ── Generic Image ────────────────────────────────────────────────
-router.post('/image', auth, uploadImage.single('image'), (req, res) => {
-  if (!req.file) return res.status(400).json({ error: 'No file uploaded' })
-  res.json({ success: true, path: req.file.path })
+// ── Generic Image (base64 JSON) ──────────────────────────────────
+router.post('/image', auth, async (req, res) => {
+  try {
+    const { data } = req.body
+    if (!data) return res.status(400).json({ error: 'No file data provided' })
+    const result = await uploadBase64(data, {
+      folder: 'portfolio/images',
+      resource_type: 'image',
+      public_id: `img-${Date.now()}`,
+    })
+    res.json({ success: true, path: result.secure_url })
+  } catch (err) {
+    console.error('Image upload error:', err)
+    res.status(500).json({ error: err.message || 'Upload failed' })
+  }
 })
 
 export default router

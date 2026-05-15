@@ -70,7 +70,7 @@ const contactLimiter = rateLimit({
   message: { error: 'Too many messages sent. Please wait before sending again.' },
 })
 
-app.use(express.json({ limit: '10mb' }))
+app.use(express.json({ limit: '20mb' }))
 // /uploads removed — files now served from Cloudinary CDN
 
 // ── API Secret Guard (Disabled) ──

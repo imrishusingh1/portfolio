@@ -21,6 +21,16 @@ const SECTION_LABELS = {
   navbar: '🧭 Navigation Bar',
 }
 
+// ── Helper: convert a File to base64 data URI ────────────────────
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = () => resolve(reader.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
 export default function AdminDashboard() {
   const { token, logout, isLoggedIn, loading: authLoading, API } = useAuth()
   const navigate = useNavigate()
@@ -175,32 +185,44 @@ export default function AdminDashboard() {
   async function uploadResume(e) {
     const file = e.target.files[0]
     if (!file) return
-    const fd = new FormData()
-    fd.append('resume', file)
-    const res = await fetch(`${API}/api/upload/resume`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: fd,
-    })
-    if (res.ok) showToast('Resume uploaded!')
-    else showToast('Upload failed')
+    showToast('Uploading resume...')
+    try {
+      const data = await fileToBase64(file)
+      const res = await fetch(`${API}/api/upload/resume`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ data }),
+      })
+      if (res.ok) showToast('✅ Resume uploaded!')
+      else {
+        const err = await res.json().catch(() => ({}))
+        showToast('Upload failed: ' + (err.error || res.status))
+      }
+    } catch (err) {
+      showToast('Upload error: ' + err.message)
+    }
   }
 
   async function uploadProfilePic(e) {
     const file = e.target.files[0]
     if (!file) return
-    const fd = new FormData()
-    fd.append('image', file)
-    const res = await fetch(`${API}/api/upload/profile`, {
-      method: 'POST',
-      headers: { Authorization: `Bearer ${token}` },
-      body: fd,
-    })
-    if (res.ok) {
-      showToast('Profile photo updated!')
-      setTimeout(() => window.location.reload(), 1000)
-    } else {
-      showToast('Upload failed')
+    showToast('Uploading photo...')
+    try {
+      const data = await fileToBase64(file)
+      const res = await fetch(`${API}/api/upload/profile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ data }),
+      })
+      if (res.ok) {
+        showToast('✅ Profile photo updated!')
+        setTimeout(() => window.location.reload(), 1000)
+      } else {
+        const err = await res.json().catch(() => ({}))
+        showToast('Upload failed: ' + (err.error || res.status))
+      }
+    } catch (err) {
+      showToast('Upload error: ' + err.message)
     }
   }
 
@@ -779,17 +801,25 @@ function SectionEditor({ section, onSave, onToggle, saving }) {
     })
   }
 
+  function fileToBase64(file) {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader()
+      reader.readAsDataURL(file)
+      reader.onload = () => resolve(reader.result)
+      reader.onerror = error => reject(error)
+    })
+  }
+
   async function handleImageUpload(path, file) {
     if (!file) return
-    const fd = new FormData()
-    fd.append('image', file)
     try {
       const token = localStorage.getItem('admin_token')
       const API = import.meta.env.VITE_API_URL || ''
+      const data = await fileToBase64(file)
       const res = await fetch(`${API}/api/upload/image`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'x-api-secret': import.meta.env.VITE_API_SECRET || '' },
-        body: fd,
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, 'x-api-secret': import.meta.env.VITE_API_SECRET || '' },
+        body: JSON.stringify({ data }),
       })
       if (res.ok) {
         const json = await res.json()
